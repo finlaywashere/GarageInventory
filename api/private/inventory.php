@@ -2,6 +2,9 @@
 
 require_once "db.php";
 
+/**
+	Gets all the information on file about a product from its product id
+*/
 function get_product($product_id){
 	$conn = db_connect();
 	if(!$conn){
@@ -21,6 +24,85 @@ function get_product($product_id){
 	$conn->close();
 	return $return;
 }
+/**
+	Helper function to update values in the db
+*/
+function update_value($table, $selector_name, $selector_value, $column_name, $column_value){
+	$conn = db_connect();
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("UPDATE ? SET ?=? WHERE ?=?;");
+	$stmt->bind_param("sssss",$table,$column_name,$column_value,$selector_name,$selector_value);
+	$stmt->execute();
+	
+	$conn->close();
+	return 1;
+}
+/**
+	Helper function to update product values
+*/
+function update_product($product_id, $column_name, $column_value){
+	return update_value("products","product_id",$product_id,$column_name,$column_value);
+}
+/**
+	Helper function to update invoice values
+*/
+function update_invoice($invoice_id, $column_name, $column_value){
+	return update_value("invoices","invoice_id",$invoice_id,$column_name,$column_value);
+}
+/**
+	Helper function to update invoice entry values
+*/
+function update_invoice_entry($entry_id, $column_name, $column_value){
+	return update_value("invoice_entries","entry_id",$entry_id,$column_name,$column_value);
+}
+
+/**
+	A whole bunch of helper functions to update various fields
+*/
+function set_product_info($product_id, $name,$desc){
+	$result = update_product($product_id,"product_name",$name);
+	if(!$result){
+		return $result;
+	}
+	return update_product($product_id,"product_desc",$desc);
+}
+function set_stock_info($product_id, $count,$location,$notes=null){
+	$result = update_product($product_id,"stock_count",$count);
+	if(!$result){
+		return $result;
+	}
+	$result = update_product($product_id,"stock_location",$location);
+	if(!$result){
+		return $result;
+	}
+	if(isset($notes)){
+		return update_product($product_id,"stock_notes",$notes;
+	}else{
+		return $result;
+	}
+}
+/**
+	Gets the pricing information from an invoice
+*/
+function get_invoice_total($invoice_id){
+	$entries = get_invoice_entries($invoice_id);
+	$subtotal = 0;
+	for($i = 0; $i < count($entries); $i++){
+		$count = $entries[$i][2];
+		$unit_price = $entries[$i][3];
+		$entry_price = $unit_price*$count;
+		$subtotal += $entry_price;
+	}
+	GLOBAL tax;
+	$total = (int) ($subtotal * tax / 100);
+	return array($total,$subtotal);
+}
+
+/**
+	Gets all the information on file about an invoice from its id
+*/
 function get_invoice($invoice_id){
 	$conn = db_connect();
 	if(!$conn){
@@ -35,11 +117,47 @@ function get_invoice($invoice_id){
 	if(!$row){
 		return 0;
 	}
-	$return = array($row['invoice_price'],$row['invoice_notes'],$row['original_id'],$row['invoice_store'],$row['invoice_price_no_tax'],$row['invoice_timestamp']);
+	$return = array($row['invoice_notes'],$row['original_id'],$row['invoice_store'],$row['invoice_timestamp']);
 
 	$conn->close();
 	return $return;
 }
+/**
+	Deletes an invoice and its entries
+*/
+function delete_invoice($invoice_id){
+	$conn = db_connect();
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("DELETE FROM `invoices` WHERE `invoice_id`=?;");
+	$stmt->bind_param("i",$invoice_id);
+	$stmt->execute();
+	$stmt = $conn->prepare("DELETE FROM `invoice_entries` WHERE `invoice_id`=?;");
+	$stmt->bind_param("i",$invoice_id);
+	$stmt->execute();
+	
+	$conn->close();
+	return 1;
+}
+/**
+	Deletes an invoice entry
+*/
+function delete_invoice_entry($entry_id){
+	$conn = db_connect();
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("DELETE FROM `invoice_entries` WHERE `entry_id`=?;");
+	$stmt->bind_param("i",$entry_id);
+	$stmt->execute();
+
+	$conn->close();
+	return 1;
+}
+/**
+	Gets all of the entries within an invoice from its id
+*/
 function get_invoice_entries($invoice_id){
 	$conn = db_connect();
 	if(!$conn){
@@ -56,7 +174,7 @@ function get_invoice_entries($invoice_id){
 	while(1){
 		$row = $result->fetch_assoc();
 		if(!$row) break;
-		array_push($return,array($row['product_id'],$row['entry_count'],$row['entry_unit_price'],$row['entry_notes']));
+		array_push($return,array($row['entry_id'],$row['product_id'],$row['entry_count'],$row['entry_unit_price'],$row['entry_notes']));
 	}
 	
 	$conn->close();

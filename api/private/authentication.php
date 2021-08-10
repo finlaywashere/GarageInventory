@@ -71,6 +71,19 @@ function register($user,$password,$email,$perms){
 	$conn->close();
 	return 1;
 }
+function change_password($user,$password){
+	$conn = db_connect();
+	if(!$conn){
+		return 0;
+	}
+	$hash = password_hash($password,PASSWORD_DEFAULT);
+	$stmt = $conn->prepare("UPDATE `users` SET `user_password`=? WHERE `user_username`=?;");
+	$stmt->bind_param("ss",$hash,$user);
+	$stmt->execute();
+	
+	$conn->close();
+	return 1;
+}
 function login_verify($user,$token){
 	$conn = db_connect();
 	if(!$conn){
