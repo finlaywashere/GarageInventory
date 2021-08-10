@@ -3,13 +3,13 @@
 require_once "authentication.php";
 
 echo "Enter username: ";
-$username = fgets(STDIN);
+$username = readline();
 echo "Enter password: ";
-$password = fgets(STDIN);
+$password = readline();
 echo "Enter permission level: ";
-$perms = (int) fgets(STDIN);
+$perms = (int) readline();
 echo "Enter email: ";
-$email = fgets(STDIN);
+$email = readline();
 
 $result = register($username,$password,$email,$perms);
 
