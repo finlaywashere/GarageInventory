@@ -140,7 +140,7 @@ function get_invoice($invoice_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array($row['invoice_notes'],$row['original_id'],$row['invoice_store'],$row['invoice_timestamp']);
+	$return = array($row['invoice_notes'],$row['original_id'],$row['invoice_store'],$row['invoice_date']);
 
 	$conn->close();
 	return $return;
