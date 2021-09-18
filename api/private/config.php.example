@@ -1,8 +1,7 @@
 <?php
 
-$dbhost = "localhost";
-$dbuser = "example";
-$dbpass = "test123";
 $dbname = "inventory";
+
+$tax = 113
 
 ?>
