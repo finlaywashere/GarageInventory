@@ -1,12 +1,11 @@
 <?php
 
-require_once "db.php";
 
 /**
 	Gets all the information on file about a product from its product id
 */
 function get_product($product_id){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -28,7 +27,7 @@ function get_product($product_id){
 	Gets the product id's of every product in the database
 */
 function get_products(){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -50,7 +49,7 @@ function get_products(){
 	Helper function to update values in the db
 */
 function update_value($table, $selector_name, $selector_value, $column_name, $column_value){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -127,7 +126,7 @@ function get_invoice_total($invoice_id){
 	Gets all the information on file about an invoice from its id
 */
 function get_invoice($invoice_id){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -149,7 +148,7 @@ function get_invoice($invoice_id){
     Gets the invoice id's of every invoide in the database
 */
 function get_invoices(){
-    $conn = db_connect();
+    $conn = db_connect("inventory");
     if(!$conn){
         return 0;
     }
@@ -172,7 +171,7 @@ function get_invoices(){
 	Deletes an invoice and its entries
 */
 function delete_invoice($invoice_id){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -190,7 +189,7 @@ function delete_invoice($invoice_id){
 	Deletes an invoice entry
 */
 function delete_invoice_entry($entry_id){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -205,7 +204,7 @@ function delete_invoice_entry($entry_id){
 	Gets all of the entry id's within an invoice from its id
 */
 function get_invoice_entries($invoice_id){
-	$conn = db_connect();
+	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
@@ -228,7 +227,7 @@ function get_invoice_entries($invoice_id){
     Gets all the information on file about an invoice entry from its id
 */
 function get_invoice_entry($entry_id){
-    $conn = db_connect();
+    $conn = db_connect("inventory");
     if(!$conn){
         return 0;
     }

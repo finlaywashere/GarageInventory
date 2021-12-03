@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 
+require_once "../private/db.php";
 require_once "../private/inventory.php";
 require_once "../private/authentication.php";
 
