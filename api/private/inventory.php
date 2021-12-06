@@ -1,5 +1,6 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
 /**
 	Gets all the information on file about a product from its product id

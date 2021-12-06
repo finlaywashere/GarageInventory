@@ -3,7 +3,7 @@
 
     $result = authenticate_request(0);
     if($result == 0){
-        header("Location: login.php?referrer=/authentication/frontend/index.php");
+        header("Location: /authentication/frontend/login.php?referrer=/authentication/frontend/index.php");
         die("Please log in!");
     }
 ?>
