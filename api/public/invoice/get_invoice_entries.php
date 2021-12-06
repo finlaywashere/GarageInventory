@@ -2,9 +2,8 @@
 
 header('Content-Type: application/json');
 
-require_once "../private/inventory.php";
-require_once "../private/authentication.php";
-require_once "../private/db.php";
+require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
+require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
 $auth = authenticate_request(1);
 if(!$auth){

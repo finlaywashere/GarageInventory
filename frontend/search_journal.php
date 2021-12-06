@@ -61,7 +61,7 @@ function clearTable(){
 
 function search(){
 	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/search_journal.php", true);
+	xmlhttp.open("POST", "/inventory/api/public/journal/search_journal.php", true);
 	xmlhttp.addEventListener("load",function() {
 		if(xmlhttp.readyState != 4)
 			return;
@@ -76,7 +76,7 @@ function search(){
 			var journals = json.journals;
 			for(let i = 0; i < journals.length; i++){
 				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/journal_data.php',true);
+				request2.open('POST','/inventory/api/public/journal/journal_data.php',true);
 				request2.addEventListener("load",function() {
 					if(request2.readyState != 4)
 						return;
