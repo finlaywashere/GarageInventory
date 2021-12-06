@@ -47,7 +47,8 @@ function journal_search($stype, $value){
 		$stmt->bind_param("s",$value);
 	}else if($stype == 3){
 		// Search by contents
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_text LIKE %?%;");
+		$value = "%".$value."%";
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_text LIKE ?;");
 		$stmt->bind_param("s",$value);
 	}else if($stype == 4){
 		// Search by journal type

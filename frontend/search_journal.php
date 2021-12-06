@@ -76,7 +76,7 @@ function search(){
 			var journals = json.journals;
 			for(let i = 0; i < journals.length; i++){
 				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/journal/journal_data.php',true);
+				request2.open('POST','/inventory/api/public/journal/journal_data.php',false);
 				request2.addEventListener("load",function() {
 					if(request2.readyState != 4)
 						return;
