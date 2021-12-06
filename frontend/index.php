@@ -16,6 +16,14 @@
 	</head>
 		<body>
 			<?php require("../../frontend/header.php");?>
-			<?php require("private/stock.php");?>
+			<div class="content">
+				<ul style="display: inline-block;">
+				<li>
+				<?php require("private/stock.php");?>
+				</li>
+				<li>
+				<h2><a href="search_journal.php">Search Journal</a></h2>
+				</li>
+			</div>
 		</body>
 </html>

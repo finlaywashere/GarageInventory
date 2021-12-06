@@ -7,10 +7,29 @@ function journal_log($type, $text, $id, $invoice){
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_invoice) VALUES (?,?,?,?)");
+	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_invoice) VALUES (?,?,?,?);");
 	$stmt->bind_param("iiii",$type,$text,$id,$invoice);
 	$stmt->execute();
 	$conn->close();
+}
+function journal_get($uid){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT * FROM `journal` WHERE `journal_uid` = ?;");
+	$stmt->bind_param("i",$uid);
+	$stmt->execute();
+	
+	$result = $stmt->get_result();
+    if(!mysqli_num_rows($result)){
+        return NULL;
+    }
+	$row = $result->fetch_assoc();
+	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "invoice" => $row['journal_invoice']);
+
+	$conn->close();
+	return $ret;
 }
 function journal_search($stype, $value){
 	$conn = db_connect("inventory");

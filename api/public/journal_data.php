@@ -9,17 +9,16 @@ $auth = authenticate_request(1);
 if(!$auth){
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!isset($_REQUEST['search_type']) || !isset($_REQUEST['search_param'])){
+if(!isset($_REQUEST['journal_uid'])){
     die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
-$type = (int) $_REQUEST['search_type'];
-$value = $_REQUEST['search_param'];
+$uid = (int) $_REQUEST['journal_uid'];
 
-$result = journal_search($type,$value);
+$result = journal_get($uid);
 
 if($result === NULL){
-	die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
+	die(json_encode(array('success' => false, 'reason' => 'invalid_uid')));
 }
-die(json_encode(array('success' => true, 'journals' => $result)));
+die(json_encode(array('success' => true, 'journal' => $result)));
 
 ?>
