@@ -49,7 +49,7 @@ function get_invoice($invoice_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array($row['invoice_notes'],$row['original_id'],$row['invoice_store'],$row['invoice_date']);
+	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "store" => $row['invoice_store'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id']);
 
 	$conn->close();
 	return $return;
@@ -149,7 +149,7 @@ function get_invoice_entry($entry_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array($row['invoice_id'],$row['product_id'],$row['entry_count'],$row['entry_unit_price'],$row['entry_notes']);
+	$return = array("invoice" => $row['invoice_id'], "product" => $row['product_id'],"count" => $row['entry_count'],"unit_price" => $row['entry_unit_price'],"notes" => $row['entry_notes']);
 
 	$conn->close();
 	return $return;

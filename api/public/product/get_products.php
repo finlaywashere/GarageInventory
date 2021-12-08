@@ -9,17 +9,20 @@ $auth = authenticate_request(1);
 if(!$auth){
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-$products = get_products();
 
-$json = "{\"success\":true,\"products\":[";
-for($i = 0; $i < count($products); $i++){
-	$json .= $products[$i].",";
+if(!isset($_REQUEST['search_type']) || !isset($_REQUEST['search_param'])){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
-if(count($products)){
-	$json = substr($json,0,-1);
-}
-$json .= "]}";
 
-die($json);
+$type = (int) $_REQUEST['search_type'];
+$value = $_REQUEST['search_param'];
+
+$products = get_products($type, $value);
+
+if($products === NULL){
+    die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
+}
+
+die(json_encode(array('success' => true, 'products' => $products)));
 
 ?>

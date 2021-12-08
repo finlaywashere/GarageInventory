@@ -14,7 +14,6 @@ if(!isset($_REQUEST['entry_id'])){
 $id = (int) $_REQUEST['entry_id'];
 
 $entry = get_invoice_entry($id);
-$array = array("invoice_id" => $entry[0], "product_id" => $entry[1], "count" => $entry[2], "unit_price" => $entry[3], "notes" => $entry[4]);
-die(json_encode($array));
+die(json_encode(array('success' => true, 'entry' => $entry)));
 
 ?>

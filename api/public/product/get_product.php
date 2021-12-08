@@ -14,7 +14,6 @@ if(!isset($_REQUEST['product_id'])){
 $id = (int) $_REQUEST['product_id'];
 
 $product = get_product($id);
-$array = array("original_id" => $product[0], "name" => $product[1], "desc" => $product[2], "count" => $product[3], "location" => $product[4], "notes" => $product[5]);
-die(json_encode($array));
+die(json_encode(array('success' => true, 'product' => $product)));
 
 ?>

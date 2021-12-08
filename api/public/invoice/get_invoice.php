@@ -14,7 +14,6 @@ if(!isset($_REQUEST['invoice_id'])){
 $id = (int) $_REQUEST['invoice_id'];
 
 $invoice = get_invoice($id);
-$array = array("notes" => $invoice[0], "original_id" => $invoice[1], "store" => $invoice[2], "timestamp" => $invoice[3]);
-die(json_encode($array));
+die(json_encode(array('success' => true,'invoice' => $invoice)));
 
 ?>

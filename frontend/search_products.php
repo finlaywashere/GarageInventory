@@ -16,13 +16,13 @@
 	<body>
 		<?php require("../../frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<label>Journal Search: </label><input id="search_param" type="text">
+			<label>Product Search: </label><input id="search_param" type="text">
 			<label>Type: </label>
 			<select id="search_type">
-				<option value="1">Invoice #</option>
-				<option value="2">Date</option>
-				<option value="3">Contents</option>
-				<option value="4">Type</option>
+				<option value="1">ID</option>
+				<option value="2">Name</option>
+				<option value="3">Location</option>
+				<option value="4">Description</option>
 			</select>
 			<button id="search">Search</button>
 			<p style="color: red;" id="error"></p>
@@ -30,12 +30,13 @@
 		<div class="content">
 			<table id="results">
 				<tr id="table_header">
-					<th>Date</th>
-					<th>Type</th>
 					<th>ID</th>
-					<th>UID</th>
-					<th>Invoice</th>
-					<th>Text</th>
+					<th>Orig ID</th>
+					<th>Name</th>
+					<th>Desc</th>
+					<th>Count</th>
+					<th>Location</th>
+					<th>Notes</th>
 				</tr>
 			</table>
 		</div>
@@ -71,7 +72,7 @@ function clearTable(){
 
 function search(){
 	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/journal/search_journal.php", true);
+	xmlhttp.open("POST", "/inventory/api/public/product/get_products.php", true);
 	xmlhttp.addEventListener("load",function() {
 		if(xmlhttp.readyState != 4)
 			return;
@@ -83,10 +84,10 @@ function search(){
 				return;
 			}
 			clearTable();
-			var journals = json.journals;
-			for(let i = 0; i < journals.length; i++){
+			var products = json.products;
+			for(let i = 0; i < products.length; i++){
 				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/journal/journal_data.php',false);
+				request2.open('POST','/inventory/api/public/product/get_product.php',false);
 				request2.addEventListener("load",function() {
 					if(request2.readyState != 4)
 						return;
@@ -103,28 +104,31 @@ function search(){
 						return;
 					}
 					var entry = document.createElement("tr");
-					var date = document.createElement("td");
-					date.innerHTML = json2.journal['date'];
-					entry.appendChild(date);
-					var type = document.createElement("td");
-					type.innerHTML = json2.journal['type'];
-					entry.appendChild(type);
 					var id = document.createElement("td");
-					id.innerHTML = json2.journal['journal_id'];
+					id.innerHTML = products[i];
 					entry.appendChild(id);
-					var uid = document.createElement("td");
-					uid.innerHTML = journals[i];
-					entry.appendChild(uid);
-					var invoice = document.createElement("td");
-					invoice.innerHTML = json2.journal['invoice'];
-					entry.appendChild(invoice);
-					var text = document.createElement("td");
-					text.innerHTML = json2.journal['text'];
-					entry.appendChild(text);
+					var oid = document.createElement("td");
+					oid.innerHTML = json2.product['original_id'];
+					entry.appendChild(oid);
+					var name = document.createElement("td");
+					name.innerHTML = json2.product['name'];
+					entry.appendChild(name);
+					var desc = document.createElement("td");
+					desc.innerHTML = json2.product['description'];
+					entry.appendChild(desc);
+					var count = document.createElement("td");
+					count.innerHTML = json2.product['count'];
+					entry.appendChild(count);
+					var location = document.createElement("td");
+					location.innerHTML = json2.product['location'];
+					entry.appendChild(location);
+					var notes = document.createElement("td");
+					notes.innerHTML = json2.product['notes'];
+					entry.appendChild(notes);
 					table.appendChild(entry);
 				});
 				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				request2.send("journal_uid="+journals[i]);
+				request2.send("product_id="+products[i]);
 			}
 		}else{
 			error.innerHTML = "An error occurred while processing your request. Error Code: "+xmlhttp.status;
