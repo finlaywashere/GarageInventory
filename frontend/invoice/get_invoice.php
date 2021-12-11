@@ -1,5 +1,5 @@
 <?php
-	require_once "../../private/authentication.php";
+	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
 	$result = authenticate_request(0);
 	if($result == 0){
@@ -14,28 +14,20 @@
 		<link rel="stylesheet" type="text/css" href="/frontend/assets/css/main.css">
 	</head>
 	<body>
-		<?php require("../../frontend/header.php");?>
+		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<label>Journal Search: </label><input id="search_param" type="text">
-			<label>Type: </label>
-			<select id="search_type">
-				<option value="1">Invoice #</option>
-				<option value="2">Date</option>
-				<option value="3">Contents</option>
-				<option value="4">Type</option>
-			</select>
+			<label>Invoice ID: </label><input id="search_param" type="number">
 			<button id="search">Search</button>
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
 			<table id="results">
 				<tr id="table_header">
-					<th>Date</th>
-					<th>Type</th>
-					<th>ID</th>
-					<th>UID</th>
-					<th>Invoice</th>
-					<th>Text</th>
+					<th>Entry ID</th>
+					<th>Product ID</th>
+					<th>Count</th>
+					<th>Unit Price</th>
+					<th>Notes</th>
 				</tr>
 			</table>
 		</div>
@@ -45,18 +37,38 @@
 
 var searchButton = document.getElementById("search");
 var param = document.getElementById("search_param");
-var type = document.getElementById("search_type");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
+
+// From https://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript/
+function getSearchParameters() {
+	var prmstr = window.location.search.substr(1);
+	return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
+}
+
+function transformToAssocArray( prmstr ) {
+	var params = {};
+	var prmarr = prmstr.split("&");
+	for ( var i = 0; i < prmarr.length; i++) {
+		var tmparr = prmarr[i].split("=");
+		params[tmparr[0]] = tmparr[1];
+	}
+	return params;
+}
+var params = getSearchParameters();
+if(params.id != undefined){
+	param.value = params.id;
+	search();
+}
 
 function clearTable(){
 	var children = table.querySelectorAll('tr')
 	for(let i = 0; i < children.length; i++){
 		let found = false;
-		if(children.childNodes != undefined){
-			for(let i1 = 0; i1 < children.childNodes.length; i1++){
-				var child = children.childNodes[i1];
+		if(children[i].childNodes != undefined){
+			for(let i1 = 0; i1 < children[i].childNodes.length; i1++){
+				var child = children[i].childNodes[i1];
 				if(child.nodeName == "TH")
 					found = true;
 			}
@@ -71,7 +83,7 @@ function clearTable(){
 
 function search(){
 	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/journal/search_journal.php", true);
+	xmlhttp.open("POST", "/inventory/api/public/invoice/get_invoice_entries.php", true);
 	xmlhttp.addEventListener("load",function() {
 		if(xmlhttp.readyState != 4)
 			return;
@@ -83,10 +95,10 @@ function search(){
 				return;
 			}
 			clearTable();
-			var journals = json.journals;
-			for(let i = 0; i < journals.length; i++){
+			var invoices = json.entries;
+			for(let i = 0; i < invoices.length; i++){
 				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/journal/journal_data.php',false);
+				request2.open('POST','/inventory/api/public/invoice/get_invoice_entry.php',false);
 				request2.addEventListener("load",function() {
 					if(request2.readyState != 4)
 						return;
@@ -103,35 +115,32 @@ function search(){
 						return;
 					}
 					var entry = document.createElement("tr");
-					var date = document.createElement("td");
-					date.innerHTML = json2.journal['date'];
-					entry.appendChild(date);
-					var type = document.createElement("td");
-					type.innerHTML = json2.journal['type'];
-					entry.appendChild(type);
 					var id = document.createElement("td");
-					id.innerHTML = json2.journal['journal_id'];
+					id.innerHTML = invoices[i];
 					entry.appendChild(id);
-					var uid = document.createElement("td");
-					uid.innerHTML = journals[i];
-					entry.appendChild(uid);
-					var invoice = document.createElement("td");
-					invoice.innerHTML = json2.journal['invoice'];
-					entry.appendChild(invoice);
-					var text = document.createElement("td");
-					text.innerHTML = json2.journal['text'];
-					entry.appendChild(text);
+					var product = document.createElement("td");
+					product.innerHTML = json2.entry['product'];
+					entry.appendChild(product);
+					var count = document.createElement("td");
+					count.innerHTML = json2.entry['count'];
+					entry.appendChild(count);
+					var price = document.createElement("td");
+					price.innerHTML = json2.entry['unit_price'];
+					entry.appendChild(price);
+					var notes = document.createElement("td");
+					notes.innerHTML = json2.entry['notes'];
+					entry.appendChild(notes);
 					table.appendChild(entry);
 				});
 				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				request2.send("journal_uid="+journals[i]);
+				request2.send("entry_id="+invoices[i]);
 			}
 		}else{
 			error.innerHTML = "An error occurred while processing your request. Error Code: "+xmlhttp.status;
 		}
 	});
 	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	xmlhttp.send("search_type="+type.value+"&search_param="+encodeURIComponent(param.value));
+	xmlhttp.send("invoice_id="+param.value);
 }
 
 </script>

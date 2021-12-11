@@ -32,6 +32,67 @@ function get_invoice_total($invoice_id){
 	return array($total,$subtotal);
 }
 
+function invoice_create($subtotal, $total, $customer, $type, $notes, $entries){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return NULL;
+	}
+	
+	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes) VALUES (?,?,?,?,?)");
+	$stmt->bind_param("iiiis",$subtotal,$total,$customer,$type,$notes);
+	$stmt->execute();
+	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$row = $result->fetch_assoc();
+	$id = $row['LAST_INSERT_ID()'];
+
+	for($i = 0; $i < count($entries); $i++){
+		$stmt = $conn->prepare("INSERT INTO invoice_entries (invoice_id, product_id, entry_count, entry_unit_price, entry_notes) VALUES (?,?,?,?,?);");
+		$stmt->bind_param("iiiis",$id,$entries[$i]->{'product'},$entries[$i]->{'count'},$entries[$i]->{'unit_price'},$entries[$i]->{'notes'});
+		$stmt->execute();
+	}
+
+	$conn->close();
+	return $id;
+}
+
+function invoice_search($stype, $value){
+    $conn = db_connect("inventory");
+    if(!$conn){
+        return NULL;
+    }
+    $stmt = NULL;
+    if($stype == 1){
+        // Search by invoice ID
+    	$conn->close();
+		return array((int) $value);
+	}else if($stype == 2){
+        // Search by date
+        $stmt = $conn->prepare("SELECT invoice_id FROM invoices WHERE DATE(invoice_date) = ?;");
+        $stmt->bind_param("s",$value);
+    }else if($stype == 3){
+        // Search by customer
+        $stmt = $conn->prepare("SELECT invoice_id FROM invoices WHERE customer_id = ?;");
+        $stmt->bind_param("i",$value);
+    }else{
+        $conn->close();
+        return NULL;
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if(!mysqli_num_rows($result)){
+        return array();
+    }
+    $return = array();
+    while($row = $result->fetch_assoc()){
+        array_push($return,$row['invoice_id']);
+    }
+    $conn->close();
+    return $return;
+}
+
+
 /**
 	Gets all the information on file about an invoice from its id
 */
@@ -49,7 +110,7 @@ function get_invoice($invoice_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id']);
+	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id']);
 
 	$conn->close();
 	return $return;

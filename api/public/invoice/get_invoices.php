@@ -9,7 +9,17 @@ $auth = authenticate_request(1);
 if(!$auth){
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-$invoices = get_invoices();
+if(!isset($_REQUEST['search_type']) || !isset($_REQUEST['search_param'])){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
+}
+$stype = (int) $_REQUEST['search_type'];
+$param = $_REQUEST['search_param'];
+
+$invoices = invoice_search($stype, $param);
+if($invoices === NULL){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
+}
+
 die(json_encode(array('success' => true, 'invoices' => $invoices)));
 
 ?>
