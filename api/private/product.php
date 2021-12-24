@@ -69,39 +69,16 @@ function get_products($type, $param){
 	$conn->close();
 	return $return;
 }
+function modify_product($id,$name,$desc,$orig_id,$notes,$location){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,original_id=?,stock_notes=?,stock_location=? WHERE product_id=?;");
+	$stmt->bind_param("sssssi",$name,$desc,$orig_id,$notes,$location,$id);
+	$stmt->execute();
 
-/**
-	Helper function to update product values
-*/
-function update_product($product_id, $column_name, $column_value){
-	return update_value("products","product_id",$product_id,$column_name,$column_value);
+	$conn->close();
 }
-
-/**
-	A whole bunch of helper functions to update various fields
-*/
-function set_product_info($product_id, $name,$desc){
-	$result = update_product($product_id,"product_name",$name);
-	if(!$result){
-		return $result;
-	}
-	return update_product($product_id,"product_desc",$desc);
-}
-function set_stock_info($product_id, $count,$location,$notes=null){
-	$result = update_product($product_id,"stock_count",$count);
-	if(!$result){
-		return $result;
-	}
-	$result = update_product($product_id,"stock_location",$location);
-	if(!result){
-		return $result;
-	}
-	if(isset($notes)){
-		return update_product($product_id,"stock_notes",$notes);
-	}else{
-		return $result;
-	}
-}
-
 
 ?>

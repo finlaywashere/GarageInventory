@@ -44,11 +44,12 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 
 var id = null;
-var count;
-var name;
-var desc;
-var notes;
-var loc;
+var count = null;
+var nameH = null;
+var desc = null;
+var notes = null;
+var loc = null;
+var pid;
 
 searchButton.addEventListener("click",search);
 saveButton.addEventListener("click",save);
@@ -76,7 +77,23 @@ if(params.id != undefined){
 
 function save(){
 	if(id == null) return;
-	//TODO: Implement changing this stuff
+	var nameS = nameH.innerHTML;
+	var idS = id.innerHTML;
+	var descS = desc.innerHTML;
+	var notesS = notes.innerHTML;
+	var locS = loc.innerHTML;
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST","/inventory/api/public/product/update_product.php");
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.send("product_id="+encodeURIComponent(pid)+"&name="+encodeURIComponent(nameS)+"&orig_id="+encodeURIComponent(idS)+"&desc="+encodeURIComponent(descS)+"&notes="+encodeURIComponent(notesS)+"&location="+encodeURIComponent(locS));
+	xhr.addEventListener("load",function() {
+		if (xhr.readyState != 4)
+			return;
+		if (xhr.status==200) {
+			var json = JSON.parse(this.responseText);
+
+		}
+	});
 }
 
 function clearTable(){
@@ -117,17 +134,16 @@ function search(){
 			id.innerHTML = json.product['original_id'];
 			id.setAttribute("contenteditable","true");
 			entry.appendChild(id);
-			name = document.createElement("td");
-			name.innerHTML = json.product['name'];
-			name.setAttribute("contenteditable","true");
-			entry.appendChild(name);
+			nameH = document.createElement("td");
+			nameH.innerHTML = json.product['name'];
+			nameH.setAttribute("contenteditable","true");
+			entry.appendChild(nameH);
 			desc = document.createElement("td");
 			desc.innerHTML = json.product['description'];
 			desc.setAttribute("contenteditable","true");
 			entry.appendChild(desc);
 			count = document.createElement("td");
 			count.innerHTML = json.product['count'];
-			count.setAttribute("contenteditable","true");
 			entry.appendChild(count);
 			notes = document.createElement("td");
 			notes.innerHTML = json.product['notes'];
@@ -144,6 +160,7 @@ function search(){
 	});
 	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 	xmlhttp.send("product_id="+param.value);
+	pid = param.value;
 }
 
 </script>

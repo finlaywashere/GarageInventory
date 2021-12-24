@@ -25,6 +25,7 @@
 				<tr id="table_header">
 					<th>Entry ID</th>
 					<th>Product ID</th>
+					<th>Product Name</th>
 					<th>Count</th>
 					<th>Unit Price</th>
 					<th>Notes</th>
@@ -114,23 +115,39 @@ function search(){
 						error.innerHTML = "An error occurred while processing your request. Error: "+json2.reason;
 						return;
 					}
-					var entry = document.createElement("tr");
-					var id = document.createElement("td");
-					id.innerHTML = invoices[i];
-					entry.appendChild(id);
-					var product = document.createElement("td");
-					product.innerHTML = json2.entry['product'];
-					entry.appendChild(product);
-					var count = document.createElement("td");
-					count.innerHTML = json2.entry['count'];
-					entry.appendChild(count);
-					var price = document.createElement("td");
-					price.innerHTML = json2.entry['unit_price'];
-					entry.appendChild(price);
-					var notes = document.createElement("td");
-					notes.innerHTML = json2.entry['notes'];
-					entry.appendChild(notes);
-					table.appendChild(entry);
+					var xhr = new XMLHttpRequest();
+					xhr.open("POST","/inventory/api/public/product/get_product.php",true);
+					xhr.addEventListener("load",function(){
+						var json3 = JSON.parse(xhr.responseText);
+						if(!json3.success){
+							console.log("Failed to retrieve product name!");
+							error.innerHTML = "An error occurred while gathering product information! Error: "+json3.reason;
+							return;
+						}
+						var entry = document.createElement("tr");
+						var id = document.createElement("td");
+						id.innerHTML = invoices[i];
+						entry.appendChild(id);
+						var product = document.createElement("td");
+						product.innerHTML = json2.entry['product'];
+						entry.appendChild(product);
+						var pName = document.createElement("td");
+						pName.innerHTML = json3.product['name'];
+						entry.appendChild(pName);
+						var count = document.createElement("td");
+	                    count.innerHTML = json2.entry['count'];
+	                    entry.appendChild(count);
+	                    var price = document.createElement("td");
+	                    price.innerHTML = "$"+json2.entry['unit_price'] / 100;
+	                    entry.appendChild(price);
+	                    var notes = document.createElement("td");
+	                    notes.innerHTML = json2.entry['notes'];
+	                    entry.appendChild(notes);
+	                    table.appendChild(entry);
+						
+					});
+					xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+					xhr.send("product_id="+json2.entry['product']);
 				});
 				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 				request2.send("entry_id="+invoices[i]);

@@ -21,6 +21,7 @@
 				<li><h2><a href="search/search_journal.php">Search Journal</a></h2></li>
 				<li><h2><a href="search/search_products.php">Search Products</a></h2></li>
 				<li><h2><a href="search/search_invoices.php">Search Invoices</a></h2></li>
+				<li><h2><a href="product/get_product.php">Update Product</a></h2></li>
 			</div>
 		</body>
 </html>
