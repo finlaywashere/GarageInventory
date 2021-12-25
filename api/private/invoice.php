@@ -2,36 +2,6 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
-/**
-	Helper function to update invoice values
-*/
-function update_invoice($invoice_id, $column_name, $column_value){
-	return update_value("invoices","invoice_id",$invoice_id,$column_name,$column_value);
-}
-/**
-	Helper function to update invoice entry values
-*/
-function update_invoice_entry($entry_id, $column_name, $column_value){
-	return update_value("invoice_entries","entry_id",$entry_id,$column_name,$column_value);
-}
-/**
-	Gets the pricing information from an invoice
-*/
-function get_invoice_total($invoice_id){
-	$entries = get_invoice_entries($invoice_id);
-	$subtotal = 0;
-	for($i = 0; $i < count($entries); $i++){
-		$entry = get_invoice_entry($i);
-		$count = $entry[2];
-		$unit_price = $entry[3];
-		$entry_price = $unit_price*$count;
-		$subtotal += $entry_price;
-	}
-	GLOBAL $tax;
-	$total = (int) ($subtotal * $tax / 100);
-	return array($total,$subtotal);
-}
-
 function invoice_create($subtotal, $total, $customer, $type, $notes, $entries){
 	$conn = db_connect("inventory");
 	if(!$conn){
@@ -46,10 +16,21 @@ function invoice_create($subtotal, $total, $customer, $type, $notes, $entries){
 	$result = $stmt->get_result();
 	$row = $result->fetch_assoc();
 	$id = $row['LAST_INSERT_ID()'];
-
 	for($i = 0; $i < count($entries); $i++){
-		$stmt = $conn->prepare("INSERT INTO invoice_entries (invoice_id, product_id, entry_count, entry_unit_price, entry_notes) VALUES (?,?,?,?,?);");
-		$stmt->bind_param("iiiis",$id,$entries[$i]->{'product'},$entries[$i]->{'count'},$entries[$i]->{'unit_price'},$entries[$i]->{'notes'});
+		$product = $entries[$i]->{'product'};
+		$orig = $entries[$i]->{'orig'};
+		$count = $entries[$i]->{'count'};
+		$unit_count = $entries[$i]->{'unit_count'};
+		$unit_price = $entries[$i]->{'unit_price'};
+		$notes = $entries[$i]->{'notes'};
+		if($notes == ""){
+			$notes = NULL;
+		}
+		if($orig == ""){
+			$orig = NULL;
+		}
+		$stmt = $conn->prepare("INSERT INTO invoice_entries (invoice_id, product_id, original_id, entry_count, unit_count, entry_unit_price, entry_notes) VALUES (?,?,?,?,?,?,?);");
+		$stmt->bind_param("iisiiis",$id,$product,$orig,$count,$unit_count,$unit_price,$notes);
 		$stmt->execute();
 	}
 
@@ -210,7 +191,7 @@ function get_invoice_entry($entry_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("invoice" => $row['invoice_id'], "product" => $row['product_id'],"count" => $row['entry_count'],"unit_price" => $row['entry_unit_price'],"notes" => $row['entry_notes']);
+	$return = array("invoice" => $row['invoice_id'], "product" => $row['product_id'], "original_id" => $row['original_id'], "unit_count" => $row['unit_count'],"count" => $row['entry_count'],"unit_price" => $row['entry_unit_price'],"notes" => $row['entry_notes']);
 
 	$conn->close();
 	return $return;

@@ -23,6 +23,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 				<option value="2">Date</option>
 				<option value="3">Contents</option>
 				<option value="4">Type</option>
+				<option value="5">User</option>
 			</select>
 			<button id="search">Search</button>
 			<p style="color: red;" id="error"></p>
@@ -35,12 +36,14 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 					<th>ID</th>
 					<th>UID</th>
 					<th>Invoice</th>
+					<th>User</th>
 					<th>Text</th>
 				</tr>
 			</table>
 		</div>
 	</body>
 </html>
+<script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
 var searchButton = document.getElementById("search");
@@ -50,91 +53,32 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
-function clearTable(){
-	var children = table.querySelectorAll('tr')
-	for(let i = 0; i < children.length; i++){
-		let found = false;
-		if(children[i].childNodes != undefined){
-			for(let i1 = 0; i1 < children[i].childNodes.length; i1++){
-				var child = children[i].childNodes[i1];
-				if(child.nodeName == "TH")
-					found = true;
-			}
-		}
-		if(found)
-			continue;
-		var child = children[i];
-		var parent = children[i].parentNode;
-		parent.removeChild(child);
-	}
-}
-
 function search(){
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/journal/search_journal.php", true);
-	xmlhttp.addEventListener("load",function() {
-		if(xmlhttp.readyState != 4)
+	var journal = search_journal(type.value,param.value);
+	if(!journal.success){
+		console.log("Failed to retrieve data!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+journal.reason;
+		return;
+	}
+	clearTable(table);
+	var journals = journal.journals;
+	for(let i = 0; i < journals.length; i++){
+		var journal = get_journal(journals[i]);
+		if(!journal.success){
+			console.log("Failed to retrieve some data!");
+			error.innerHTML = "An error occurred while processing your request. Error: "+journal.reason;
 			return;
-		if (xmlhttp.status==200) {
-			var json = JSON.parse(this.responseText);
-			if(!json.success){
-				console.log("Failed to retrieve data!");
-				error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
-				return;
-			}
-			clearTable();
-			var journals = json.journals;
-			for(let i = 0; i < journals.length; i++){
-				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/journal/journal_data.php',false);
-				request2.addEventListener("load",function() {
-					if(request2.readyState != 4)
-						return;
-					if (request2.status != 200) {
-						error.innerHTML = "An error occurred while processing your request. Error Code: "+request2.status;
-						console.log("Error occurred! Code: "+request2.status);
-						console.log(request2.readyState);
-						return;
-					}
-					var json2 = JSON.parse(request2.responseText);
-					if(!json2.success){
-						console.log("Failed to retrieve some data!");
-						error.innerHTML = "An error occurred while processing your request. Error: "+json2.reason;
-						return;
-					}
-					var entry = document.createElement("tr");
-					var date = document.createElement("td");
-					date.innerHTML = json2.journal['date'];
-					entry.appendChild(date);
-					var type = document.createElement("td");
-					type.innerHTML = json2.journal['type'];
-					entry.appendChild(type);
-					var id = document.createElement("td");
-					id.innerHTML = json2.journal['journal_id'];
-					entry.appendChild(id);
-					var uid = document.createElement("td");
-					uid.innerHTML = journals[i];
-					entry.appendChild(uid);
-					var invoice = document.createElement("td");
-					var invLink = document.createElement("a");
-                    invLink.href="/inventory/frontend/invoice/get_invoice.php?id="+json2.journal['invoice'];
-					invLink.innerHTML = json2.journal['invoice'];
-					invoice.appendChild(invLink);
-					entry.appendChild(invoice);
-					var text = document.createElement("td");
-					text.innerHTML = json2.journal['text'];
-					entry.appendChild(text);
-					table.appendChild(entry);
-				});
-				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				request2.send("journal_uid="+journals[i]);
-			}
-		}else{
-			error.innerHTML = "An error occurred while processing your request. Error Code: "+xmlhttp.status;
 		}
-	});
-	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	xmlhttp.send("search_type="+type.value+"&search_param="+encodeURIComponent(param.value));
+		var entry = document.createElement("tr");
+		createElement(journal.journal['date'],entry);
+		createElement(journal_type_to_string(journal.journal['type']),entry);
+		createElement(journal.journal['journal_id'],entry);
+		createElement(journals[i],entry);
+		createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+journal.journal['invoice']+"\">"+journal.journal['invoice']+"</a>",entry);
+		createElement(journal.journal['user'],entry);
+		createElement(journal.journal['text'],entry);
+		table.appendChild(entry);
+	}
 }
 
 </script>

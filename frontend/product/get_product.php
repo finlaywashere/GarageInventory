@@ -1,7 +1,7 @@
 <?php
 	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
-	$result = authenticate_request(0);
+	$result = authenticate_request(2);
 	if($result == 0){
 		header("Location: /authentication/frontend/login.php?referrer=/authentication/frontend/index.php");
 		die("Please log in!");
@@ -24,7 +24,6 @@
 		<div class="content">
 			<table id="results" style="width: 80%;">
 				<tr id="table_header">
-					<th>Original ID</th>
 					<th>Name</th>
 					<th>Description</th>
 					<th>Count</th>
@@ -43,7 +42,6 @@ var param = document.getElementById("search_param");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
 
-var id = null;
 var count = null;
 var nameH = null;
 var desc = null;
@@ -76,16 +74,15 @@ if(params.id != undefined){
 }
 
 function save(){
-	if(id == null) return;
+	if(nameH == null) return;
 	var nameS = nameH.innerHTML;
-	var idS = id.innerHTML;
 	var descS = desc.innerHTML;
 	var notesS = notes.innerHTML;
 	var locS = loc.innerHTML;
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST","/inventory/api/public/product/update_product.php");
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhr.send("product_id="+encodeURIComponent(pid)+"&name="+encodeURIComponent(nameS)+"&orig_id="+encodeURIComponent(idS)+"&desc="+encodeURIComponent(descS)+"&notes="+encodeURIComponent(notesS)+"&location="+encodeURIComponent(locS));
+	xhr.send("product_id="+encodeURIComponent(pid)+"&name="+encodeURIComponent(nameS)+"&desc="+encodeURIComponent(descS)+"&notes="+encodeURIComponent(notesS)+"&location="+encodeURIComponent(locS));
 	xhr.addEventListener("load",function() {
 		if (xhr.readyState != 4)
 			return;
@@ -130,10 +127,6 @@ function search(){
 			}
 			clearTable();
 			var entry = document.createElement("tr");
-			id = document.createElement("td");
-			id.innerHTML = json.product['original_id'];
-			id.setAttribute("contenteditable","true");
-			entry.appendChild(id);
 			nameH = document.createElement("td");
 			nameH.innerHTML = json.product['name'];
 			nameH.setAttribute("contenteditable","true");

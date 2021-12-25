@@ -34,7 +34,7 @@
 					<th>ID</th>
 					<th>Subtotal</th>
 					<th>Total</th>
-					<th>Customer ID</th>
+					<th>Customer</th>
 					<th>Original ID</th>
 					<th>Notes</th>
 				</tr>
@@ -42,6 +42,7 @@
 		</div>
 	</body>
 </html>
+<script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
 var searchButton = document.getElementById("search");
@@ -51,97 +52,41 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
-function clearTable(){
-	var children = table.querySelectorAll('tr')
-	for(let i = 0; i < children.length; i++){
-		let found = false;
-		if(children[i].childNodes != undefined){
-			for(let i1 = 0; i1 < children[i].childNodes.length; i1++){
-				var child = children[i].childNodes[i1];
-				if(child.nodeName == "TH")
-					found = true;
-			}
-		}
-		if(found)
-			continue;
-		var child = children[i];
-		var parent = children[i].parentNode;
-		parent.removeChild(child);
-	}
-}
-
 function search(){
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/invoice/get_invoices.php", true);
-	xmlhttp.addEventListener("load",function() {
-		if(xmlhttp.readyState != 4)
+	var invoicesJ = get_invoices(type.value,param.value);
+	if(!invoicesJ.success){
+		console.log("Failed to retrieve data!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+invoicesJ.reason;
+		return;
+	}
+	clearTable(table);
+	var invoices = invoicesJ.invoices;
+	for(let i = 0; i < invoices.length; i++){
+		var invoice = get_invoice(invoices[i]);
+		if(!invoice.success){
+			console.log("Failed to retrieve some data!");
+			error.innerHTML = "An error occurred while processing your request. Error: "+invoice.reason;
 			return;
-		if (xmlhttp.status==200) {
-			var json = JSON.parse(this.responseText);
-			if(!json.success){
-				console.log("Failed to retrieve data!");
-				error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
-				return;
-			}
-			clearTable();
-			var invoices = json.invoices;
-			for(let i = 0; i < invoices.length; i++){
-				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/invoice/get_invoice.php',false);
-				request2.addEventListener("load",function() {
-					if(request2.readyState != 4)
-						return;
-					if (request2.status != 200) {
-						error.innerHTML = "An error occurred while processing your request. Error Code: "+request2.status;
-						console.log("Error occurred! Code: "+request2.status);
-						console.log(request2.readyState);
-						return;
-					}
-					var json2 = JSON.parse(request2.responseText);
-					if(!json2.success){
-						console.log("Failed to retrieve some data!");
-						error.innerHTML = "An error occurred while processing your request. Error: "+json2.reason;
-						return;
-					}
-					var entry = document.createElement("tr");
-					var date = document.createElement("td");
-					date.innerHTML = json2.invoice['date'];
-					entry.appendChild(date);
-					var type = document.createElement("td");
-					type.innerHTML = json2.invoice['type'];
-					entry.appendChild(type);
-					var id = document.createElement("td");
-					var idLink = document.createElement("a");
-					idLink.href="/inventory/frontend/invoice/get_invoice.php?id="+json2.invoice['invoice_id'];
-					idLink.innerHTML = json2.invoice['invoice_id'];
-					id.appendChild(idLink);
-					entry.appendChild(id);
-					var subtotal = document.createElement("td");
-					subtotal.innerHTML = json2.invoice['subtotal'];
-					entry.appendChild(subtotal);
-					var total = document.createElement("td");
-					total.innerHTML = json2.invoice['total'];
-					entry.appendChild(total);
-					var customer = document.createElement("td");
-					customer.innerHTML = json2.invoice['customer'];
-					entry.appendChild(customer);
-					var originalId = document.createElement("td");
-					originalId.innerHTML = json2.invoice['original_id'];
-					entry.appendChild(originalId);
-					var notes = document.createElement("td");
-					notes.innerHTML = json2.invoice['notes'];
-					entry.appendChild(notes);
-					table.appendChild(entry);
-				});
-				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				request2.send("invoice_id="+invoices[i]);
-			}
-		}else{
-			error.innerHTML = "An error occurred while processing your request. Error Code: "+xmlhttp.status;
 		}
-	});
-	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	xmlhttp.send("search_type="+type.value+"&search_param="+encodeURIComponent(param.value));
+		var customer = get_customer(invoice.invoice['customer']);
+		if(!customer.success){
+			console.log("Failed to retrieve some data!");
+			error.innerHTML = "An error occurred while processing your request. Error: "+customer.reason;
+			return;
+		}
+		var entry = document.createElement("tr");
+		createElement(invoice.invoice['date'],entry);
+		var iType = invoice.invoice['type'];
+		createElement(invoice_type_to_string(iType),entry);
+		createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+invoice.invoice['invoice_id']+"\">"+invoice.invoice['invoice_id']+"</a>",entry);
+		createElement("$"+invoice.invoice['subtotal'],entry);
+		createElement("$"+invoice.invoice['total'],entry);
+
+		createElement(customer.customer['name'],entry);
+		createElement(invoice.invoice['original_id'],entry);
+		createElement(invoice.invoice['notes'],entry);
+		table.appendChild(entry);
+	}
 }
 
 </script>

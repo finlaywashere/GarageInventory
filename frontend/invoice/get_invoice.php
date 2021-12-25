@@ -21,143 +21,119 @@
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
+			<h2>Invoice Information</h2>
+			<table id="invoice_table">
+				<tr id="table_header">
+					<th>Date</th>
+					<th>Type</th>
+					<th>ID</th>
+					<th>Subtotal</th>
+					<th>Total</th>
+					<th>Customer</th>
+					<th>Original ID</th>
+					<th>Notes</th>
+				</tr>
+			</table>
+			<br>
+			<h2>Entries</h2>
 			<table id="results">
 				<tr id="table_header">
 					<th>Entry ID</th>
 					<th>Product ID</th>
+					<th>Original ID</th>
 					<th>Product Name</th>
 					<th>Count</th>
+					<th>Unit Count</th>
 					<th>Unit Price</th>
 					<th>Notes</th>
+					<th>Entry Total</th>
 				</tr>
 			</table>
 		</div>
 	</body>
 </html>
+<script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
 var searchButton = document.getElementById("search");
 var param = document.getElementById("search_param");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
+var iTable = document.getElementById("invoice_table");
 searchButton.addEventListener("click",search);
 
-// From https://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript/
-function getSearchParameters() {
-	var prmstr = window.location.search.substr(1);
-	return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
-}
-
-function transformToAssocArray( prmstr ) {
-	var params = {};
-	var prmarr = prmstr.split("&");
-	for ( var i = 0; i < prmarr.length; i++) {
-		var tmparr = prmarr[i].split("=");
-		params[tmparr[0]] = tmparr[1];
-	}
-	return params;
-}
 var params = getSearchParameters();
 if(params.id != undefined){
 	param.value = params.id;
 	search();
 }
 
-function clearTable(){
-	var children = table.querySelectorAll('tr')
-	for(let i = 0; i < children.length; i++){
-		let found = false;
-		if(children[i].childNodes != undefined){
-			for(let i1 = 0; i1 < children[i].childNodes.length; i1++){
-				var child = children[i].childNodes[i1];
-				if(child.nodeName == "TH")
-					found = true;
-			}
-		}
-		if(found)
-			continue;
-		var child = children[i];
-		var parent = children[i].parentNode;
-		parent.removeChild(child);
-	}
-}
-
 function search(){
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/invoice/get_invoice_entries.php", true);
-	xmlhttp.addEventListener("load",function() {
-		if(xmlhttp.readyState != 4)
+	clearTable(table);
+	clearTable(iTable);
+	var invoice = get_invoice(param.value);
+	if(!invoice.success){
+		console.log("Failed to retrieve data!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+invoice.reason;
+		return;
+	}
+	var customer = get_customer(invoice.invoice['customer']);
+	if(!customer.success){
+		console.log("Failed to retrieve data!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+customer.reason;
+		return;
+	}
+	var entry = document.createElement("tr");
+	createElement(invoice.invoice['date'],entry);
+	var iType = invoice.invoice['type'];
+	createElement(invoice_type_to_string(iType),entry);
+	createElement(invoice.invoice['invoice_id'],entry);
+	var subtotal = invoice.invoice['subtotal']/100;
+	createElement("$"+subtotal,entry);
+	createElement("$"+(invoice.invoice['total']/100),entry);
+	createElement(customer.customer['name'],entry);
+	createElement(invoice.invoice['original_id'],entry);
+	createElement(invoice.invoice['notes'],entry);
+	iTable.appendChild(entry);
+	
+	var entries = get_invoice_entries(param.value);
+	if(!entries.success){
+		console.log("Failed to retrieve data!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+entries.reason;
+		return;
+	}
+	var total = 0;
+	var invoices = entries.entries;
+	for(let i = 0; i < invoices.length; i++){
+		var entry = get_invoice_entry(invoices[i]);
+		if(!entry.success){
+			console.log("Failed to retrieve some data!");
+			error.innerHTML = "An error occurred while processing your request. Error: "+entry.reason;
 			return;
-		if (xmlhttp.status==200) {
-			var json = JSON.parse(this.responseText);
-			if(!json.success){
-				console.log("Failed to retrieve data!");
-				error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
-				return;
-			}
-			clearTable();
-			var invoices = json.entries;
-			for(let i = 0; i < invoices.length; i++){
-				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/invoice/get_invoice_entry.php',false);
-				request2.addEventListener("load",function() {
-					if(request2.readyState != 4)
-						return;
-					if (request2.status != 200) {
-						error.innerHTML = "An error occurred while processing your request. Error Code: "+request2.status;
-						console.log("Error occurred! Code: "+request2.status);
-						console.log(request2.readyState);
-						return;
-					}
-					var json2 = JSON.parse(request2.responseText);
-					if(!json2.success){
-						console.log("Failed to retrieve some data!");
-						error.innerHTML = "An error occurred while processing your request. Error: "+json2.reason;
-						return;
-					}
-					var xhr = new XMLHttpRequest();
-					xhr.open("POST","/inventory/api/public/product/get_product.php",true);
-					xhr.addEventListener("load",function(){
-						var json3 = JSON.parse(xhr.responseText);
-						if(!json3.success){
-							console.log("Failed to retrieve product name!");
-							error.innerHTML = "An error occurred while gathering product information! Error: "+json3.reason;
-							return;
-						}
-						var entry = document.createElement("tr");
-						var id = document.createElement("td");
-						id.innerHTML = invoices[i];
-						entry.appendChild(id);
-						var product = document.createElement("td");
-						product.innerHTML = json2.entry['product'];
-						entry.appendChild(product);
-						var pName = document.createElement("td");
-						pName.innerHTML = json3.product['name'];
-						entry.appendChild(pName);
-						var count = document.createElement("td");
-	                    count.innerHTML = json2.entry['count'];
-	                    entry.appendChild(count);
-	                    var price = document.createElement("td");
-	                    price.innerHTML = "$"+json2.entry['unit_price'] / 100;
-	                    entry.appendChild(price);
-	                    var notes = document.createElement("td");
-	                    notes.innerHTML = json2.entry['notes'];
-	                    entry.appendChild(notes);
-	                    table.appendChild(entry);
-						
-					});
-					xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-					xhr.send("product_id="+json2.entry['product']);
-				});
-				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				request2.send("entry_id="+invoices[i]);
-			}
-		}else{
-			error.innerHTML = "An error occurred while processing your request. Error Code: "+xmlhttp.status;
 		}
-	});
-	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	xmlhttp.send("invoice_id="+param.value);
+		var product = get_product(entry.entry['product']);
+		if(!product.success){
+			console.log("Failed to retrieve product name!");
+			error.innerHTML = "An error occurred while gathering product information! Error: "+product.reason;
+			return;
+		}
+		var tEntry = document.createElement("tr");
+		createElement(invoices[i],tEntry);
+		createElement(entry.entry['product'],tEntry);
+		createElement(entry.entry['original_id'],tEntry);
+		createElement(product.product['name'],tEntry);
+		createElement(entry.entry['count'],tEntry);
+		createElement(entry.entry['unit_count'],tEntry);
+		createElement("$"+(entry.entry['unit_price'] / 100),tEntry);
+		createElement(entry.entry['notes'],tEntry);
+		var lTotal = (entry.entry['count']/entry.entry['unit_count']*entry.entry['unit_price']/100);
+		createElement("$"+lTotal, tEntry)
+		total += lTotal;
+		table.appendChild(tEntry);
+	}
+	if(total != subtotal){
+		error.innerHTML = "Warning: Subtotal does not equal sum of entries!";
+	}
 }
 
 </script>

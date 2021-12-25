@@ -2,13 +2,13 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
-function journal_log($type, $text, $id, $invoice){
+function journal_log($type, $text, $id, $invoice, $user){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_invoice) VALUES (?,?,?,?);");
-	$stmt->bind_param("iiii",$type,$text,$id,$invoice);
+	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_invoice, journal_user) VALUES (?,?,?,?,?);");
+	$stmt->bind_param("iiiis",$type,$text,$id,$invoice,$user);
 	$stmt->execute();
 	$conn->close();
 }
@@ -26,7 +26,7 @@ function journal_get($uid){
         return NULL;
     }
 	$row = $result->fetch_assoc();
-	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "invoice" => $row['journal_invoice']);
+	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "invoice" => $row['journal_invoice'], "user" => $row['journal_user']);
 
 	$conn->close();
 	return $ret;
@@ -54,6 +54,10 @@ function journal_search($stype, $value){
 		// Search by journal type
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_id = ?;");
 		$stmt->bind_param("i",$value);
+	}else if($stype == 5){
+		// Search by user
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_user = ?;");
+		$stmt->bind_param("s",$value);
 	}else{
 		$conn->close();
 		return NULL;

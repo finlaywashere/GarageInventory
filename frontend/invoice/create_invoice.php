@@ -16,16 +16,20 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<label>Invoice ID: </label><input id="search_param" type="number">
-			<button id="search">Search</button>
+			<label>Customer: </label><input id="customer" type="number">
+			<label>Type: </label><input id="type" type="number">
+			<label>Notes: </label><input id="notes" type="text">
+			<button id="create">Create</button>
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
+			<button id="add">Add Row</button><br>
 			<table id="results">
 				<tr id="table_header">
-					<th>Entry ID</th>
 					<th>Product ID</th>
+					<th>Original ID</th>
 					<th>Count</th>
+					<th>Unit Count</th>
 					<th>Unit Price</th>
 					<th>Notes</th>
 				</tr>
@@ -33,72 +37,70 @@
 		</div>
 	</body>
 </html>
+<script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
-var createButton = document.getElementById("search");
+var createButton = document.getElementById("create");
 var error = document.getElementById("error");
-createButton.addEventListener("click",);
+var customer = document.getElementById("customer");
+var type = document.getElementById("type");
+var notes = document.getElementById("notes");
+var add = document.getElementById("add");
+var entries = document.getElementById("results");
+add.addEventListener("click",addRow);
+createButton.addEventListener("click",create);
+
+function addRow(){
+	var r = document.createElement("tr");
+	for(var i = 0; i < 6; i++){
+		var tmp = document.createElement("td");
+		tmp.setAttribute("contenteditable","true");
+		tmp.innerHTML = "";
+		r.appendChild(tmp);
+	}
+	entries.appendChild(r);
+}
 
 function create(){
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST", "/inventory/api/public/invoice/get_invoice_entries.php", true);
-	xmlhttp.addEventListener("load",function() {
-		if(xmlhttp.readyState != 4)
-			return;
-		if (xmlhttp.status==200) {
-			var json = JSON.parse(this.responseText);
-			if(!json.success){
-				console.log("Failed to retrieve data!");
-				error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
-				return;
-			}
-			clearTable();
-			var invoices = json.entries;
-			for(let i = 0; i < invoices.length; i++){
-				var request2 = new XMLHttpRequest();
-				request2.open('POST','/inventory/api/public/invoice/get_invoice_entry.php',false);
-				request2.addEventListener("load",function() {
-					if(request2.readyState != 4)
-						return;
-					if (request2.status != 200) {
-						error.innerHTML = "An error occurred while processing your request. Error Code: "+request2.status;
-						console.log("Error occurred! Code: "+request2.status);
-						console.log(request2.readyState);
-						return;
-					}
-					var json2 = JSON.parse(request2.responseText);
-					if(!json2.success){
-						console.log("Failed to retrieve some data!");
-						error.innerHTML = "An error occurred while processing your request. Error: "+json2.reason;
-						return;
-					}
-					var entry = document.createElement("tr");
-					var id = document.createElement("td");
-					id.innerHTML = invoices[i];
-					entry.appendChild(id);
-					var product = document.createElement("td");
-					product.innerHTML = json2.entry['product'];
-					entry.appendChild(product);
-					var count = document.createElement("td");
-					count.innerHTML = json2.entry['count'];
-					entry.appendChild(count);
-					var price = document.createElement("td");
-					price.innerHTML = json2.entry['unit_price'];
-					entry.appendChild(price);
-					var notes = document.createElement("td");
-					notes.innerHTML = json2.entry['notes'];
-					entry.appendChild(notes);
-					table.appendChild(entry);
-				});
-				request2.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				request2.send("entry_id="+invoices[i]);
-			}
-		}else{
-			error.innerHTML = "An error occurred while processing your request. Error Code: "+xmlhttp.status;
+	var rows = [];
+	var subtotal = 0;
+	for(var i = 0; i < entries.childNodes.length; i++){
+		var child = entries.childNodes[i];
+		if(child.nodeName == "TR"){
+			var map = {};
+			var columns = child.childNodes;
+			map["product"] = columns[0].innerHTML.replace(/(<([^>]+)>)/gi, "");
+			map["orig"] = columns[1].innerHTML.replace(/(<([^>]+)>)/gi, "");
+			map["count"] = columns[2].innerHTML.replace(/(<([^>]+)>)/gi, "");
+			map["unit_count"] = columns[3].innerHTML.replace(/(<([^>]+)>)/gi, "");
+			var price = columns[4].innerHTML.replace(/(<([^>]+)>)/gi, "");
+			if(price.startsWith("$"))
+				price = price.substring(1) * 100;
+			map["unit_price"] = Math.floor(price);
+			map["notes"] = columns[5].innerHTML.replace(/(<([^>]+)>)/gi, "");
+			var lTotal = map['count'] / map['unit_count'] * price;
+			subtotal += lTotal;
+			rows.push(map);
 		}
-	});
-	xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	xmlhttp.send("invoice_id="+param.value);
+	}
+	var map2 = {};
+	map2["entries"] = rows;
+	map2["customer"] = customer.value;
+	map2["notes"] = notes.value;
+	map2["type"] = type.value;
+	map2["subtotal"] = Math.floor(subtotal);
+	map2["total"] = Math.floor(subtotal * 1.13);
+	
+	var data = JSON.stringify(map2);
+	console.log(data);
+	var result = create_invoice(data);
+	if(!result.success){
+		console.log("Failed to retrieve data!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+result.reason;
+		return;
+	}
+	var id = result.invoice;
+	location.href="/inventory/frontend/invoice/get_invoice.php?id="+id;
 }
 
 </script>

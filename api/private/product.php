@@ -19,7 +19,7 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("original_id" => $row['original_id'],"name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes']);
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes']);
 
 	$conn->close();
 	return $return;
@@ -69,13 +69,13 @@ function get_products($type, $param){
 	$conn->close();
 	return $return;
 }
-function modify_product($id,$name,$desc,$orig_id,$notes,$location){
+function modify_product($id,$name,$desc,$notes,$location){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,original_id=?,stock_notes=?,stock_location=? WHERE product_id=?;");
-	$stmt->bind_param("sssssi",$name,$desc,$orig_id,$notes,$location,$id);
+	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_location=? WHERE product_id=?;");
+	$stmt->bind_param("ssssi",$name,$desc,$orig_id,$notes,$location,$id);
 	$stmt->execute();
 
 	$conn->close();
