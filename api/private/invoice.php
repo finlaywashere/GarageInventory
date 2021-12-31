@@ -2,14 +2,14 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
-function invoice_create($subtotal, $total, $customer, $type, $notes, $entries){
+function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $paid, $orig_id, $date){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
 	
-	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes) VALUES (?,?,?,?,?)");
-	$stmt->bind_param("iiiis",$subtotal,$total,$customer,$type,$notes);
+	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes,invoice_paid, original_id, invoice_date) VALUES (?,?,?,?,?,?,?,?)");
+	$stmt->bind_param("iiiisiss",$subtotal,$total,$customer,$type,$notes,$paid,$orig_id,$date);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
 	$stmt->execute();
@@ -23,15 +23,17 @@ function invoice_create($subtotal, $total, $customer, $type, $notes, $entries){
 		$unit_count = $entries[$i]->{'unit_count'};
 		$unit_price = $entries[$i]->{'unit_price'};
 		$notes = $entries[$i]->{'notes'};
+		$discount = $entries[$i]->{'unit_discount'};
 		if($notes == ""){
 			$notes = NULL;
 		}
 		if($orig == ""){
 			$orig = NULL;
 		}
-		$stmt = $conn->prepare("INSERT INTO invoice_entries (invoice_id, product_id, original_id, entry_count, unit_count, entry_unit_price, entry_notes) VALUES (?,?,?,?,?,?,?);");
-		$stmt->bind_param("iisiiis",$id,$product,$orig,$count,$unit_count,$unit_price,$notes);
+		$stmt = $conn->prepare("INSERT INTO invoice_entries (invoice_id, product_id, original_id, entry_count, unit_count, entry_unit_price, entry_notes, entry_discount) VALUES (?,?,?,?,?,?,?,?);");
+		$stmt->bind_param("iisiiisi",$id,$product,$orig,$count,$unit_count,$unit_price,$notes,$discount);
 		$stmt->execute();
+		adjust_stock($product,$count);
 	}
 
 	$conn->close();
@@ -91,7 +93,7 @@ function get_invoice($invoice_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id']);
+	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id'], "paid" => $row['invoice_paid']);
 
 	$conn->close();
 	return $return;
@@ -191,7 +193,7 @@ function get_invoice_entry($entry_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("invoice" => $row['invoice_id'], "product" => $row['product_id'], "original_id" => $row['original_id'], "unit_count" => $row['unit_count'],"count" => $row['entry_count'],"unit_price" => $row['entry_unit_price'],"notes" => $row['entry_notes']);
+	$return = array("invoice" => $row['invoice_id'], "product" => $row['product_id'], "original_id" => $row['original_id'], "unit_count" => $row['unit_count'],"count" => $row['entry_count'],"unit_price" => $row['entry_unit_price'],"notes" => $row['entry_notes'], "unit_discount" => $row['entry_discount']);
 
 	$conn->close();
 	return $return;

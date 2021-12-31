@@ -46,5 +46,46 @@ function update_customer($id, $name, $email, $phone, $address, $type, $notes){
 	$stmt->execute();
 	$conn->close();
 }
+function customer_search($stype, $value){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return NULL;
+	}
+	$stmt = NULL;
+	if($stype == 1){
+		// Search by name
+		$value = "%".$value."%";
+        $stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_name LIKE ?;");
+		$stmt->bind_param("s",$value);
+	}else if($stype == 2){
+		// Search by phone
+		$value = "%".$value."%";
+		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_phone LIKE ?;");
+		$stmt->bind_param("s",$value);
+	}else if($stype == 3){
+		// Search by email
+		$value = "%".$value."%";
+		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_email LIKE ?;");
+		$stmt->bind_param("i",$value);
+	}else if($stype == 4){
+		// Search by ID
+		$conn->close();
+		return array((int) $value);
+	}else{
+		$conn->close();
+		return NULL;
+	}
+	$stmt->execute();
+	$result = $stmt->get_result();
+	if(!mysqli_num_rows($result)){
+		return array();
+	}
+	$return = array();
+	while($row = $result->fetch_assoc()){
+		array_push($return,$row['customer_id']);
+	}
+	$conn->close();
+	return $return;
+}
 
 ?>

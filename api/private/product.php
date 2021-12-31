@@ -75,10 +75,42 @@ function modify_product($id,$name,$desc,$notes,$location){
 		return 0;
 	}
 	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_location=? WHERE product_id=?;");
-	$stmt->bind_param("ssssi",$name,$desc,$orig_id,$notes,$location,$id);
+	$stmt->bind_param("ssssi",$name,$desc,$notes,$location,$id);
 	$stmt->execute();
 
 	$conn->close();
 }
+function create_product($name,$desc,$notes,$loc){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return NULL;
+	}
 
+	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_location) VALUES (?,?,?,?)");
+	$stmt->bind_param("ssss",$name,$desc,$notes,$loc);
+	$stmt->execute();
+	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$row = $result->fetch_assoc();
+	$id = $row['LAST_INSERT_ID()'];
+	$conn->close();
+	return $id;
+}
+function adjust_stock($id, $adj){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
+    :q
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+	$curr = $stmt->get_result()->fetch_assoc()['stock_count'];
+	$new = $curr+$adj;
+	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
+	$stmt->bind_param("ii",$new,$id);
+	$stmt->execute();
+	return $new;
+}
 ?>

@@ -19,9 +19,10 @@
 			<label>Invoice Search: </label><input id="search_param" type="text">
 			<label>Type: </label>
 			<select id="search_type">
-				<option value="1">Invoice #</option>
-				<option value="2">Date</option>
-				<option value="3">Customer ID</option>
+				<option value="1">ID</option>
+				<option value="2">Name</option>
+				<option value="3">Location</option>
+				<option value="4">Description</option>
 			</select>
 			<button id="search">Search</button>
 			<p style="color: red;" id="error"></p>
@@ -29,14 +30,12 @@
 		<div class="content">
 			<table id="results">
 				<tr id="table_header">
-					<th>Date</th>
-					<th>Type</th>
 					<th>ID</th>
-					<th>Subtotal</th>
-					<th>Total</th>
-					<th>Customer</th>
-					<th>Original ID</th>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Count</th>
 					<th>Notes</th>
+					<th>Location</th>
 				</tr>
 			</table>
 		</div>
@@ -53,38 +52,28 @@ var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
 function search(){
-	var invoicesJ = get_invoices(type.value,param.value);
-	if(!invoicesJ.success){
+	var products = get_products(type.value,param.value);
+	if(!products.success){
 		console.log("Failed to retrieve data!");
-		error.innerHTML = "An error occurred while processing your request. Error: "+invoicesJ.reason;
+		error.innerHTML = "An error occurred while processing your request. Error: "+products.reason;
 		return;
 	}
 	clearTable(table);
-	var invoices = invoicesJ.invoices;
-	for(let i = 0; i < invoices.length; i++){
-		var invoice = get_invoice(invoices[i]);
-		if(!invoice.success){
+	var p = products.products;
+	for(let i = 0; i < p.length; i++){
+		var product = get_product(p[i]);
+		if(!product.success){
 			console.log("Failed to retrieve some data!");
-			error.innerHTML = "An error occurred while processing your request. Error: "+invoice.reason;
-			return;
-		}
-		var customer = get_customer(invoice.invoice['customer']);
-		if(!customer.success){
-			console.log("Failed to retrieve some data!");
-			error.innerHTML = "An error occurred while processing your request. Error: "+customer.reason;
+			error.innerHTML = "An error occurred while processing your request. Error: "+product.reason;
 			return;
 		}
 		var entry = document.createElement("tr");
-		createElement(invoice.invoice['date'],entry);
-		var iType = invoice.invoice['type'];
-		createElement(invoice_type_to_string(iType),entry);
-		createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+invoice.invoice['invoice_id']+"\">"+invoice.invoice['invoice_id']+"</a>",entry);
-		createElement("$"+invoice.invoice['subtotal']/100,entry);
-		createElement("$"+invoice.invoice['total']/100,entry);
-
-		createElement(customer.customer['name'],entry);
-		createElement(invoice.invoice['original_id'],entry);
-		createElement(invoice.invoice['notes'],entry);
+		createElement("<a href=\"/inventory/frontend/product/get_product.php?id="+p[i]+"\">"+p[i]+"</a>",entry);
+		createElement(product.product['name'],entry);
+		createElement(product.product['description'],entry);
+		createElement(product.product['count'],entry);
+		createElement(product.product['notes'],entry);
+		createElement(product.product['location'],entry);
 		table.appendChild(entry);
 	}
 }

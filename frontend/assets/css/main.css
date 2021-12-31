@@ -1,0 +1,12 @@
+.content ul li{
+	padding: 5px;
+	margin: 5px;
+	width: 10%;
+	height: 10%;
+}
+.content ul{
+	display: inline-block;
+}
+input{
+	margin-bottom: 5px;
+}

@@ -16,7 +16,7 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<label>Product ID: </label><input id="search_param" type="number">
+			<label>Customer ID: </label><input id="search_param" type="number">
 			<button id="search">Search</button>
 			<button id="save">Save</button>
 			<p style="color: red;" id="error"></p>
@@ -25,10 +25,11 @@
 			<table id="results" style="width: 80%;">
 				<tr id="table_header">
 					<th>Name</th>
-					<th>Description</th>
-					<th>Count</th>
+					<th>Type</th>
+					<th>Email</th>
+					<th>Phone #</th>
+					<th>Address</th>
 					<th>Notes</th>
-					<th>Location</th>
 				</tr>
 			</table>
 		</div>
@@ -44,10 +45,12 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 
 var nameH = null;
-var desc = null;
+var type = null;
 var notes = null;
-var loc = null;
-var pid;
+var email = null;
+var phone = null;
+var address = null;
+var cid;
 
 searchButton.addEventListener("click",search);
 saveButton.addEventListener("click",save);
@@ -61,10 +64,17 @@ if(params.id != undefined){
 function save(){
 	if(nameH == null) return;
 	var nameS = nameH.innerHTML;
-	var descS = desc.innerHTML;
+	var typeI = string_to_customer_type(type.innerHTML);
+	if(typeI === -1){
+		error.innerHTML = "Invalid customer type!";
+		return;
+	}
 	var notesS = notes.innerHTML;
-	var locS = loc.innerHTML;
-	var json = update_product(pid,nameS,descS,notesS,locS);
+	var emailS = email.innerHTML;
+	var phoneS = phone.innerHTML;
+	var addressS = address.innerHTML;
+	
+	var json = update_customer(cid,nameS,typeI,emailS,phoneS,addressS,notesS);
 	if(!json.success){
 		console.log("Failed to save data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
@@ -73,22 +83,23 @@ function save(){
 }
 
 function search(){
-	var json = get_product(param.value);
-	clearTable(table);
 	error.innerHTML = "";
-	if(!json.success){
+	var customer = get_customer(param.value);
+	clearTable(table);
+	if(!customer.success){
 		console.log("Failed to retrieve data!");
-		error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
+		error.innerHTML = "An error occurred while processing your request. Error: "+customer.reason;
 		return;
 	}
 	var entry = document.createElement("tr");
-	nameH = createEditableElement(json.product['name'],entry);
-	desc = createEditableElement(json.product['description'],entry);
-	createElement(json.product['count'],entry);
-	notes = createEditableElement(json.product['notes'],entry);
-	loc = createEditableElement(json.product['location'],entry);
+	nameH = createEditableElement(customer.customer['name'],entry);
+	type = createEditableElement(customer_type_to_string(customer.customer['type']),entry);
+	email = createEditableElement(customer.customer['email'],entry);
+	phone = createEditableElement(customer.customer['phone'],entry);
+	address = createEditableElement(customer.customer['address'],entry);
+	notes = createEditableElement(customer.customer['notes'],entry);
 	table.appendChild(entry);
-	pid = param.value;
+	cid = param.value;
 }
 
 </script>

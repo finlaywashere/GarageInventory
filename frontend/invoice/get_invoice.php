@@ -45,6 +45,7 @@
 					<th>Count</th>
 					<th>Unit Count</th>
 					<th>Unit Price</th>
+					<th>Unit Discount</th>
 					<th>Notes</th>
 					<th>Entry Total</th>
 				</tr>
@@ -124,14 +125,17 @@ function search(){
 		createElement(product.product['name'],tEntry);
 		createElement(entry.entry['count'],tEntry);
 		createElement(entry.entry['unit_count'],tEntry);
-		createElement("$"+(entry.entry['unit_price'] / 100),tEntry);
+		var price = entry.entry['unit_price'] / 100;
+		createElement("$"+price,tEntry);
+		var discount = entry.entry['unit_discount'] / 100;
+		createElement("$"+discount,tEntry);
 		createElement(entry.entry['notes'],tEntry);
-		var lTotal = (entry.entry['count']/entry.entry['unit_count']*entry.entry['unit_price']/100);
-		createElement("$"+lTotal, tEntry)
+		var lTotal = (entry.entry['count']/entry.entry['unit_count']*(price-discount));
+		createElement("$"+lTotal.toFixed(2), tEntry)
 		total += lTotal;
 		table.appendChild(tEntry);
 	}
-	if(total != subtotal){
+	if(total.toFixed(2) != subtotal.toFixed(2)){
 		error.innerHTML = "Warning: Subtotal does not equal sum of entries!";
 	}
 }

@@ -14,6 +14,9 @@ if(!isset($_REQUEST['customer_id'])){
 $id = (int) $_REQUEST['customer_id'];
 
 $customer = get_customer($id);
+if($customer == null){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_id')));
+}
 die(json_encode(array('success' => true,'customer' => $customer)));
 
 ?>
