@@ -33,7 +33,9 @@
 				?>
 			</select><br>
 			<button id="create">Create</button>
+			<button id="reset">Reset</button>
 			<p style="color: red;" id="error"></p>
+			<p style="color: green;" id="success"></p>
 		</div>
 	</body>
 </html>
@@ -41,7 +43,9 @@
 <script>
 
 var createButton = document.getElementById("create");
+var resetButton = document.getElementById("reset");
 var error = document.getElementById("error");
+var success = document.getElementById("success");
 
 var nameI = document.getElementById("name");
 var email = document.getElementById("email");
@@ -51,17 +55,31 @@ var notes = document.getElementById("notes");
 var type = document.getElementById("type");
 
 createButton.addEventListener("click",create);
+resetButton.addEventListener("click",reset);
+
+function reset(){
+	error.innerHTML = "";
+	success.innerHTML = "";
+	nameI.value = "";
+	email.value = "";
+	phone.value = "";
+	address.value = "";
+	notes.value = "";
+	type.selectedIndex = 0;
+}
 
 function create(){
 	if(nameI.value.length == 0) return;
+	error.innerHTML = "";
+	success.innerHTML = "";
 	var result = create_customer(nameI.value,email.value,phone.value,address.value,notes.value,type.value);
 	if(!result.success){
 		console.log("Failed to retrieve data!");
-		error.innerHTML = "An error occurred while processing your request. Error: "+result.reason;
+		error.value = "An error occurred while processing your request. Error: "+result.reason;
 		return;
 	}
 	var id = result.customer;
-	location.href="/inventory/frontend/customer/get_customer.php?id="+id;
+	success.innerHTML = "Successfully created customer with id <a href=/inventory/frontend/customer/get_customer.php?id="+id+">"+id+"</a>";
 }
 
 </script>

@@ -70,6 +70,7 @@ if(params.id != undefined){
 }
 
 function search(){
+	error.innerHTML = "";
 	clearTable(table);
 	clearTable(iTable);
 	var invoice = get_invoice(param.value);

@@ -103,7 +103,6 @@ function adjust_stock($id, $adj){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
-    :q
 	$stmt->bind_param("i",$id);
 	$stmt->execute();
 	$curr = $stmt->get_result()->fetch_assoc()['stock_count'];
