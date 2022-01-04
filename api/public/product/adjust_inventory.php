@@ -4,22 +4,19 @@ header('Content-Type: application/json');
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
-$auth = authenticate_request(2);
+$auth = authenticate_request(20);
 if(!$auth){
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!isset($_REQUEST['product_id']) || !isset($_REQUEST['name']) || !isset($_REQUEST['desc']) || !isset($_REQUEST['notes']) || !isset($_REQUEST['location'])){
+if(!isset($_REQUEST['product_id']) || !isset($_REQUEST['count'])){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
 $id = (int) $_REQUEST['product_id'];
-$name = $_REQUEST['name'];
-$desc = $_REQUEST['desc'];
-$notes = $_REQUEST['notes'];
-$location = $_REQUEST['location'];
+$count = (int) $_REQUEST['count'];
 
-modify_product($id,$name,$desc,$notes,$location);
+set_inventory($id,$count);
 
-journal_log(2,"Product ".$id." updated",3,$id,get_username());
+journal_log(5,"Product ".$id." inventory changed to ".$count,1,$id,get_username());
 
 die(json_encode(array('success' => true)));
 

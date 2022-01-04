@@ -35,6 +35,15 @@
 					<li><h3><a href="invoice/get_invoice.php">Invoice Information</a></h3></li>
 					<li><h3><a href="customer/get_customer.php">Customer Information</a></h3></li>
 				</ul>
+				<?php
+					if(authenticate_request(20)){
+						// Administrative stuff
+						echo "<h2>Administrative Actions</h2><br>";
+						echo "<ul class=\"admin\">";
+						echo "<li><h3><a href=\"admin/adjust_inventory.php\">Adjust Inventory</a></h3></li>";
+						echo "</ul>";
+					}
+				?>
 			</div>
 		</body>
 </html>

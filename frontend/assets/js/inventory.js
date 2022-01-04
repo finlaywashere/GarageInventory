@@ -66,6 +66,27 @@ function customer_type_to_string(type){
 		return "UNK";
 	}
 }
+function journal_id_to_string(type){
+	if(type === 0){
+		return "SYSTEM";
+	}else if(type === 1){
+		return "INVOICE";
+	}else if(type === 2){
+		return "CUSTOMER";
+	}else if(type === 3){
+		return "PRODUCT";
+	}else if(type === 4){
+		return "JOURNAL";
+	}else if(type === 5){
+		return "ADMINISTRATIVE";
+	}else if(type === 6){
+		return "SECURITY";
+	}else if(type === 7){
+		return "OVERRIDE";
+	}else{
+		return "UNK";
+	}
+}
 function journal_type_to_string(type){
 	if(type === 0){
 		return "SYS";
@@ -75,8 +96,6 @@ function journal_type_to_string(type){
 		return "MOD";
 	}else if(type === 3){
 		return "DEL";
-	}else if(type === 4){
-		return "ACC";
 	}else{
 		return "UNK";
 	}

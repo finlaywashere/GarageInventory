@@ -2,13 +2,31 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
-function journal_log($type, $text, $id, $invoice, $user){
+/*
+* Journal ids
+* 1 = Invoice
+* 2 = Customer
+* 3 = Product
+* 4 = Journal
+* 5 = Administrative
+* 6 = Security
+* 7 = Override
+*
+* Journal types
+* 1 = Create
+* 2 = Modify
+* 3 = Delete
+*
+* Note: For all transactions that don't touch an invoice, use the product_id or customer_id for the data
+*/
+
+function journal_log($type, $text, $id, $ref, $user){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_invoice, journal_user) VALUES (?,?,?,?,?);");
-	$stmt->bind_param("iiiis",$type,$text,$id,$invoice,$user);
+	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_ref, journal_user) VALUES (?,?,?,?,?);");
+	$stmt->bind_param("isiis",$type,$text,$id,$ref,$user);
 	$stmt->execute();
 	$conn->close();
 }
@@ -26,7 +44,7 @@ function journal_get($uid){
         return NULL;
     }
 	$row = $result->fetch_assoc();
-	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "invoice" => $row['journal_invoice'], "user" => $row['journal_user']);
+	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "ref" => $row['journal_ref'], "user" => $row['journal_user']);
 
 	$conn->close();
 	return $ret;

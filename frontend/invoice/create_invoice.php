@@ -297,11 +297,10 @@ function create(){
 	map2["date"] = date.value;
 
 	var data = JSON.stringify(map2);
-	console.log(data);
 	var result = create_invoice(data);
 	if(!result.success){
 		console.log("Failed to retrieve data!");
-		error.value = "An error occurred while processing your request. Error: "+result.reason;
+		error.innerHTML = "An error occurred while processing your request. Error: "+result.reason;
 		return;
 	}
 	var id = result.invoice;

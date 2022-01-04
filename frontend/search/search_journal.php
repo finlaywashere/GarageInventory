@@ -10,7 +10,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 <html>
 	<head>
 		<title>Internal Inventory Services</title>
-		<link rel="stylesheet" type="text/css" href="assets/css/main.css">
+		<link rel="stylesheet" type="text/css" href="/inventory/frontend/assets/css/main.css">
 		<link rel="stylesheet" type="text/css" href="/frontend/assets/css/main.css">
 	</head>
 	<body>
@@ -35,7 +35,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 					<th>Type</th>
 					<th>ID</th>
 					<th>UID</th>
-					<th>Invoice</th>
+					<th>Reference</th>	
 					<th>User</th>
 					<th>Text</th>
 				</tr>
@@ -48,13 +48,13 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 
 var searchButton = document.getElementById("search");
 var param = document.getElementById("search_param");
-var type = document.getElementById("search_type");
+var search_type = document.getElementById("search_type");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
 function search(){
-	var journal = search_journal(type.value,param.value);
+	var journal = search_journal(search_type.value,param.value);
 	if(!journal.success){
 		console.log("Failed to retrieve data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+journal.reason;
@@ -71,10 +71,24 @@ function search(){
 		}
 		var entry = document.createElement("tr");
 		createElement(journal.journal['date'],entry);
-		createElement(journal_type_to_string(journal.journal['type']),entry);
-		createElement(journal.journal['journal_id'],entry);
+		var type = journal.journal['type'];
+		createElement(journal_type_to_string(type),entry);
+		var id = journal.journal['journal_id'];
+		createElement(journal_id_to_string(id),entry);
 		createElement(journals[i],entry);
-		createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+journal.journal['invoice']+"\">"+journal.journal['invoice']+"</a>",entry);
+		var ref = journal.journal['ref'];
+		if(id === 1){
+			// Invoice
+			createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+ref+"\">Invoice "+ref+"</a>",entry);
+		}else if(id === 2){
+			// Customer
+			createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+ref+"\">Customer "+ref+"</a>",entry);
+		}else if(id === 3){
+			// Product
+			createElement("<a href=\"/inventory/frontend/product/get_product.php?id="+ref+"\">Product "+ref+"</a>",entry);
+		}else{
+			createElement(ref,entry);
+		}
 		createElement(journal.journal['user'],entry);
 		createElement(journal.journal['text'],entry);
 		table.appendChild(entry);

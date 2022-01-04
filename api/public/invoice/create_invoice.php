@@ -15,12 +15,12 @@ $data = json_decode($_REQUEST['data']);
 if(!isset($data->{'paid'}) || !isset($data->{'subtotal'}) || !isset($data->{'total'}) || !isset($data->{'notes'}) || !isset($data->{'customer'}) || !isset($data->{'type'}) || !isset($data->{'entries'}) || !isset($data->{'orig_id'}) || !isset($data->{'date'})){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
-$paid = $data->{'paid'};
-$subtotal = $data->{'subtotal'};
-$total = $data->{'total'};
+$paid = (int) $data->{'paid'};
+$subtotal = (int) $data->{'subtotal'};
+$total = (int) $data->{'total'};
 $notes = $data->{'notes'};
-$customer = $data->{'customer'};
-$type = $data->{'type'};
+$customer = (int) $data->{'customer'};
+$type = (int) $data->{'type'};
 $entries = $data->{'entries'};
 $date = $data->{'date'};
 $orig_id = $data->{'orig_id'};
@@ -33,7 +33,11 @@ for($i = 0; $i < count($entries); $i++){
 
 $invoice = invoice_create($subtotal,$total,$customer,$type,$notes,$entries,$paid, $orig_id, $date);
 
-journal_log(1,"Invoice ".$invoice." created",1,0,get_username());
+if(!$invoice){
+	die(json_encode(array('success' => false,'reason' => 'internal_error')));
+}
+
+journal_log(1,"Invoice ".$invoice." created",1,$invoice,get_username());
 
 die(json_encode(array('success' => true,'invoice' => $invoice)));
 

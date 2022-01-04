@@ -100,7 +100,7 @@ function create_product($name,$desc,$notes,$loc){
 function adjust_stock($id, $adj){
 	$conn = db_connect("inventory");
 	if(!$conn){
-		return 0;
+		return NULL;
 	}
 	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
 	$stmt->bind_param("i",$id);
@@ -111,5 +111,15 @@ function adjust_stock($id, $adj){
 	$stmt->bind_param("ii",$new,$id);
 	$stmt->execute();
 	return $new;
+}
+function set_inventory($id, $value){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
+	$stmt->bind_param("ii",$value,$id);
+	$stmt->execute();
+	return 1;
 }
 ?>

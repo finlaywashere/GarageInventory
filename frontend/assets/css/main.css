@@ -35,3 +35,6 @@ input{
 	margin-right: 5px;
 	display: inline-block;
 }
+.admin h3 a{
+	color: purple;
+}

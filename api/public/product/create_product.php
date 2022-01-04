@@ -18,7 +18,7 @@ $loc = $_REQUEST['loc'];
 
 $product = create_product($name,$desc,$notes,$loc);
 
-journal_log(3,"Product ".$product." created",1,0,get_username());
+journal_log(1,"Product ".$product." created",3,$product,get_username());
 
 die(json_encode(array('success' => true,'product' => $product)));
 

@@ -20,7 +20,7 @@ $notes = $_REQUEST['notes'];
 
 $customer = create_customer($name,$email,$phone,$address,$type,$notes);
 
-journal_log(2,"Customer ".$customer." created",1,0,get_username());
+journal_log(1,"Customer ".$customer." created",2,$customer,get_username());
 
 die(json_encode(array('success' => true,'customer' => $customer)));
 
