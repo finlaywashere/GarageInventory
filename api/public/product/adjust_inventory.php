@@ -13,10 +13,12 @@ if(!isset($_REQUEST['product_id']) || !isset($_REQUEST['count'])){
 }
 $id = (int) $_REQUEST['product_id'];
 $count = (int) $_REQUEST['count'];
-
+$notes = "";
+if(isset($_REQUEST['notes']))
+	$notes = $_REQUEST['notes'];
 set_inventory($id,$count);
 
-journal_log(5,"Product ".$id." inventory changed to ".$count,1,$id,get_username());
+journal_log(2,"Product ".$id." inventory changed to ".$count." with notes \"".$notes."\"",3,$id,get_username());
 
 die(json_encode(array('success' => true)));
 

@@ -131,6 +131,9 @@ function json_request(url,args){
 	xmlhttp.send(args);
 	return result;
 }
+function isWhole(num){
+	return !isNaN(parseInt(num)) && isFinite(num) && (num % 1 == 0);
+}
 function strip(str){
 	return str.replace(/(<([^>]+)>)/gi, "");
 }
@@ -181,4 +184,7 @@ function get_products(type,param){
 }
 function create_product(name,desc,notes,loc){
 	return json_request("/inventory/api/public/product/create_product.php", "name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&loc="+encode(loc));
+}
+function adjust_inventory(id,count,notes){
+	return json_request("/inventory/api/public/product/adjust_inventory.php", "product_id="+id+"&count="+count+"&notes="+encode(notes));
 }
