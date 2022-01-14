@@ -2,25 +2,24 @@
 header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
-require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
 $auth = authenticate_request(4);
 if(!$auth){
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!isset($_REQUEST['name']) || !isset($_REQUEST['email']) || !isset($_REQUEST['phone']) || !isset($_REQUEST['address']) || !isset($_REQUEST['type']) || !isset($_REQUEST['notes'])){
+if(!req_param('name') || !req_param('email') || !req_param('phone') || !req_param('address') || !req_param_i('type') || !req_param('notes')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_customer')));
 }
-$name = $_REQUEST['name'];
-$email = $_REQUEST['email'];
-$phone = $_REQUEST['phone'];
-$address = $_REQUEST['address'];
-$type = $_REQUEST['type'];
-$notes = $_REQUEST['notes'];
+$name = req_get('name');
+$email = req_get('email');
+$phone = req_get('phone');
+$address = req_get('address');
+$type = req_get('type');
+$notes = req_get('notes');
 
 $customer = create_customer($name,$email,$phone,$address,$type,$notes);
 
-journal_log(1,"Customer ".$customer." created",2,$customer,get_username());
+journal_log(1,"Customer ".$customer." created",2,$customer,get_username(),$_SERVER['REMOTE_ADDR']);
 
 die(json_encode(array('success' => true,'customer' => $customer)));
 

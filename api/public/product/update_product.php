@@ -2,24 +2,23 @@
 header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
-require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
 $auth = authenticate_request(2);
 if(!$auth){
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!isset($_REQUEST['product_id']) || !isset($_REQUEST['name']) || !isset($_REQUEST['desc']) || !isset($_REQUEST['notes']) || !isset($_REQUEST['location'])){
+if(!req_param('product_id') || !req_param('name') || !req_param('desc') || !req_param('notes') || !req_param('location')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
-$id = (int) $_REQUEST['product_id'];
-$name = $_REQUEST['name'];
-$desc = $_REQUEST['desc'];
-$notes = $_REQUEST['notes'];
-$location = $_REQUEST['location'];
+$id = req_get('product_id');
+$name = req_get('name');
+$desc = req_get('desc');
+$notes = req_get('notes');
+$location = req_get('location');
 
 modify_product($id,$name,$desc,$notes,$location);
 
-journal_log(2,"Product ".$id." updated",3,$id,get_username());
+journal_log(2,"Product ".$id." updated",3,$id,get_username(),$_SERVER['REMOTE_ADDR']);
 
 die(json_encode(array('success' => true)));
 

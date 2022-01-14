@@ -20,13 +20,13 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 * Note: For all transactions that don't touch an invoice, use the product_id or customer_id for the data
 */
 
-function journal_log($type, $text, $id, $ref, $user){
+function journal_log($type, $text, $id, $ref, $user, $ip){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_ref, journal_user) VALUES (?,?,?,?,?);");
-	$stmt->bind_param("isiis",$type,$text,$id,$ref,$user);
+	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_ref, journal_user, journal_ip) VALUES (?,?,?,?,?,?);");
+	$stmt->bind_param("isiiss",$type,$text,$id,$ref,$user,$ip);
 	$stmt->execute();
 	$conn->close();
 }
@@ -44,7 +44,7 @@ function journal_get($uid){
         return NULL;
     }
 	$row = $result->fetch_assoc();
-	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "ref" => $row['journal_ref'], "user" => $row['journal_user']);
+	$ret = array("date" => $row['journal_date'], "type" => $row['journal_type'], "text" => $row['journal_text'], "journal_id" => $row['journal_id'], "ref" => $row['journal_ref'], "user" => $row['journal_user'], "ip" => $row['journal_ip']);
 
 	$conn->close();
 	return $ret;
@@ -75,6 +75,11 @@ function journal_search($stype, $value){
 	}else if($stype == 5){
 		// Search by user
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_user = ?;");
+		$stmt->bind_param("s",$value);
+	}else if($stype == 6){
+		// Search by ip
+		$value = "%".$value."%";
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_ip LIKE ?;");
 		$stmt->bind_param("s",$value);
 	}else{
 		$conn->close();

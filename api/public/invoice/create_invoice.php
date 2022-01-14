@@ -2,33 +2,37 @@
 header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
-require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
 
 $auth = authenticate_request(2);
 if(!$auth){
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!isset($_REQUEST['data'])){
+if(!req_param('data')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
+// Its ok to directly access the request here because req_get sanitizes stuff and it could break the JSON
 $data = json_decode($_REQUEST['data']);
-if(!isset($data->{'paid'}) || !isset($data->{'subtotal'}) || !isset($data->{'total'}) || !isset($data->{'notes'}) || !isset($data->{'customer'}) || !isset($data->{'type'}) || !isset($data->{'entries'}) || !isset($data->{'orig_id'}) || !isset($data->{'date'})){
+if($data == NULL){
+	die(json_encode(array('success') => false, 'reason' => 'invalid_data'));
+}
+if(!json_cont_i($data,'paid',) || !json_cont_i($data,'subtotal') || !json_cont_i($data,'total') || !json_cont($data,'notes') || !json_cont_i($data,'customer') || !json_cont_i($data,'type') || !json_cont($data,'entries') || !json_cont($data,'orig_id') || !json_cont($data,'date')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
 $paid = (int) $data->{'paid'};
 $subtotal = (int) $data->{'subtotal'};
 $total = (int) $data->{'total'};
-$notes = $data->{'notes'};
+$notes = sanitize($data->{'notes'});
 $customer = (int) $data->{'customer'};
 $type = (int) $data->{'type'};
 $entries = $data->{'entries'};
-$date = $data->{'date'};
-$orig_id = $data->{'orig_id'};
+$date = sanitize($data->{'date'});
+$orig_id = sanitize($data->{'orig_id'});
 
 for($i = 0; $i < count($entries); $i++){
-	if(!isset($entries[$i]->{'product'}) || !isset($entries[$i]->{'orig'}) || !isset($entries[$i]->{'count'}) || !isset($entries[$i]->{'unit_count'}) || !isset($entries[$i]->{'unit_price'}) || !isset($entries[$i]->{'unit_discount'}) || !isset($entries[$i]->{'notes'})){
+	if(!json_cont_i($entries[$i],'product') || !json_cont_i($entries[$i],'orig') || !json_cont_i($entries[$i],'count') || !json_cont_i($entries[$i],'unit_count') || !json_cont_i($entries[$i],'unit_price') || !json_cont_i($entries[$i],'unit_discount') || !json_cont($entries[$i],'notes')){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
+	$entries[$i]->{'notes'} = sanitize($entries[$i]->{'notes'});
 }
 
 $invoice = invoice_create($subtotal,$total,$customer,$type,$notes,$entries,$paid, $orig_id, $date);
@@ -37,7 +41,7 @@ if(!$invoice){
 	die(json_encode(array('success' => false,'reason' => 'internal_error')));
 }
 
-journal_log(1,"Invoice ".$invoice." created",1,$invoice,get_username());
+journal_log(1,"Invoice ".$invoice." created",1,$invoice,get_username(),$_SERVER['REMOTE_ADDR']);
 
 die(json_encode(array('success' => true,'invoice' => $invoice)));
 

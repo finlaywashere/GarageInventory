@@ -24,6 +24,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 				<option value="3">Contents</option>
 				<option value="4">Type</option>
 				<option value="5">User</option>
+				<option value="6">IP</option>
 			</select>
 			<button id="search">Search</button>
 			<p style="color: red;" id="error"></p>
@@ -37,6 +38,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.ph
 					<th>UID</th>
 					<th>Reference</th>	
 					<th>User</th>
+					<th>IP</th>
 					<th>Text</th>
 				</tr>
 			</table>
@@ -90,6 +92,7 @@ function search(){
 			createElement(ref,entry);
 		}
 		createElement(journal.journal['user'],entry);
+		createElement(journal.journal['ip'],entry);
 		createElement(journal.journal['text'],entry);
 		table.appendChild(entry);
 	}
