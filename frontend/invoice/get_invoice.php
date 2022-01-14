@@ -1,10 +1,9 @@
 <?php
-	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/authentication.php";
+	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
 	$result = authenticate_request(0);
 	if($result == 0){
-		header("Location: /authentication/frontend/login.php?referrer=/authentication/frontend/index.php");
-		die("Please log in!");
+		force_login();
 	}
 ?>
 <html>
