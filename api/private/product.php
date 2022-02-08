@@ -27,7 +27,7 @@ function get_product($product_id){
 /**
 	Gets the product id's of every product in the database (with search params)
 */
-function get_products($type, $param){
+function get_products($type, $param, $offset, $limit){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
@@ -35,23 +35,23 @@ function get_products($type, $param){
 	$stmt = NULL;
 	if($type == 1){
 		// Search by ID
-		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_id=?;");
-		$stmt->bind_param("i",$param);
+		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_id=? AND product_id > ? LIMIT ?;");
+		$stmt->bind_param("iii",$param,$offset,$limit);
 	}else if($type == 2){
 		// Search by name
 		$param = "%".$param."%";
-		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_name LIKE ?;");
-		$stmt->bind_param("s",$param);
+		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_name LIKE ? AND product_id > ? LIMIT ?;");
+		$stmt->bind_param("sii",$param,$offset,$limit);
 	}else if($type == 3){
 		// Search by location
 		$param = "%".$param."%";
-		$stmt = $conn->prepare("SELECT product_id FROM products WHERE stock_location LIKE ?;");
-		$stmt->bind_param("s",$param);
+		$stmt = $conn->prepare("SELECT product_id FROM products WHERE stock_location LIKE ? AND product_id > ? LIMIT ?;");
+		$stmt->bind_param("sii",$param,$offset,$limit);
 	}else if($type == 4){
 		// Search by description
 		$param = "%".$param."%";
-		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_desc LIKE ?;");
-		$stmt->bind_param("s",$param);
+		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_desc LIKE ? AND product_id > ? LIMIT ?;");
+		$stmt->bind_param("sii",$param,$offset,$limit);
 	}else{
 		$conn->close();
 		return NULL;

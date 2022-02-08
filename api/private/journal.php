@@ -49,7 +49,7 @@ function journal_get($uid){
 	$conn->close();
 	return $ret;
 }
-function journal_search($stype, $value){
+function journal_search($stype, $value, $start, $count){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
@@ -57,30 +57,30 @@ function journal_search($stype, $value){
 	$stmt = NULL;
 	if($stype == 1){
 		// Search by invoice
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_invoice = ?;");
-		$stmt->bind_param("i",$value);
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_invoice = ? AND journal_uid > ? LIMIT ?;");
+		$stmt->bind_param("iii",$value,$start,$count);
 	}else if($stype == 2){
 		// Search by date
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE DATE(journal_date) = ?;");
-		$stmt->bind_param("s",$value);
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE DATE(journal_date) = ? AND journal_uid > ? LIMIT ?;");
+		$stmt->bind_param("sii",$value,$start,$count);
 	}else if($stype == 3){
 		// Search by contents
 		$value = "%".$value."%";
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_text LIKE ?;");
-		$stmt->bind_param("s",$value);
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_text LIKE ? AND journal_uid > ? LIMIT ?;");
+		$stmt->bind_param("sii",$value,$start,$count);
 	}else if($stype == 4){
 		// Search by journal type
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_id = ?;");
-		$stmt->bind_param("i",$value);
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_id = ? AND journal_uid > ? LIMIT ?;");
+		$stmt->bind_param("iii",$value,$start,$count);
 	}else if($stype == 5){
 		// Search by user
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_user = ?;");
-		$stmt->bind_param("s",$value);
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_user = ? AND journal_uid > ? LIMIT ?;");
+		$stmt->bind_param("sii",$value,$start,$count);
 	}else if($stype == 6){
 		// Search by ip
 		$value = "%".$value."%";
-		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_ip LIKE ?;");
-		$stmt->bind_param("s",$value);
+		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_ip LIKE ? AND journal_uid > ? LIMIT ?;");
+		$stmt->bind_param("sii",$value,$start,$count);
 	}else{
 		$conn->close();
 		return NULL;

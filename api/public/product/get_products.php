@@ -12,11 +12,19 @@ if(!$auth){
 if(!req_param_i('search_type') || !req_param('search_param')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
+$offset = 0;
+$limit = 20;
+if(req_param_i('search_offset')){
+	$offset = req_get('search_offset');
+}
+if(req_param_i('search_limit')){
+	$limit = req_get('search_offset');
+}
 
 $type = req_get('search_type');
 $value = req_get('search_param');
 
-$products = get_products($type, $value);
+$products = get_products($type, $value, $offset, $limit);
 
 if($products === NULL){
     die(json_encode(array('success' => false, 'reason' => 'invalid_type')));

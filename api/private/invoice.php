@@ -2,13 +2,13 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
-function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $paid, $orig_id, $date){
+function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $paid, $orig_id, $date, $related=0){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
 	
-	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes,invoice_paid, original_id, invoice_date) VALUES (?,?,?,?,?,?,?,?)");
+	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes,invoice_paid, original_id, invoice_date, invoice_related) VALUES (?,?,?,?,?,?,?,?,?)");
 	$stmt->bind_param("iiiisiss",$subtotal,$total,$customer,$type,$notes,$paid,$orig_id,$date);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
@@ -40,7 +40,7 @@ function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $
 	return $id;
 }
 
-function invoice_search($stype, $value){
+function invoice_search($stype, $value, $offset, $limit){
     $conn = db_connect("inventory");
     if(!$conn){
         return NULL;
@@ -52,12 +52,12 @@ function invoice_search($stype, $value){
 		return array((int) $value);
 	}else if($stype == 2){
         // Search by date
-        $stmt = $conn->prepare("SELECT invoice_id FROM invoices WHERE DATE(invoice_date) = ?;");
-        $stmt->bind_param("s",$value);
+        $stmt = $conn->prepare("SELECT invoice_id FROM invoices WHERE DATE(invoice_date) = ? AND invoice_id > ? LIMIT ?;");
+        $stmt->bind_param("sii",$value,$offset,$limit);
     }else if($stype == 3){
         // Search by customer
-        $stmt = $conn->prepare("SELECT invoice_id FROM invoices WHERE customer_id = ?;");
-        $stmt->bind_param("i",$value);
+        $stmt = $conn->prepare("SELECT invoice_id FROM invoices WHERE customer_id = ? AND invoice_id > ? LIMIT ?;");
+        $stmt->bind_param("iii",$value,$offset,$limit);
     }else{
         $conn->close();
         return NULL;
@@ -93,7 +93,7 @@ function get_invoice($invoice_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id'], "paid" => $row['invoice_paid']);
+	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id'], "paid" => $row['invoice_paid'], "related" => $row['invoice_related']);
 
 	$conn->close();
 	return $return;

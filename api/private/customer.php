@@ -46,7 +46,7 @@ function update_customer($id, $name, $email, $phone, $address, $type, $notes){
 	$stmt->execute();
 	$conn->close();
 }
-function customer_search($stype, $value){
+function customer_search($stype, $value, $offset, $limit){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
@@ -55,18 +55,18 @@ function customer_search($stype, $value){
 	if($stype == 1){
 		// Search by name
 		$value = "%".$value."%";
-        $stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_name LIKE ?;");
-		$stmt->bind_param("s",$value);
+        $stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_name LIKE ? AND customer_id > ? LIMIT ?;");
+		$stmt->bind_param("sii",$value,$offset,$limit);
 	}else if($stype == 2){
 		// Search by phone
 		$value = "%".$value."%";
-		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_phone LIKE ?;");
-		$stmt->bind_param("s",$value);
+		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_phone LIKE ? AND customer_id > ? LIMIT ?;");
+		$stmt->bind_param("sii",$value,$offset,$limit);
 	}else if($stype == 3){
 		// Search by email
 		$value = "%".$value."%";
-		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_email LIKE ?;");
-		$stmt->bind_param("i",$value);
+		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_email LIKE ? AND customer_id > ? LIMIT ?;");
+		$stmt->bind_param("iii",$value,$offset,$limit);
 	}else if($stype == 4){
 		// Search by ID
 		$conn->close();
