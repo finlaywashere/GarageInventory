@@ -13,7 +13,7 @@ if(!req_param('data')){
 // Its ok to directly access the request here because req_get sanitizes stuff and it could break the JSON
 $data = json_decode($_REQUEST['data']);
 if($data == NULL){
-	die(json_encode(array('success') => false, 'reason' => 'invalid_data'));
+	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
 if(!json_cont_i($data,'paid',) || !json_cont_i($data,'subtotal') || !json_cont_i($data,'total') || !json_cont($data,'notes') || !json_cont_i($data,'customer') || !json_cont_i($data,'type') || !json_cont($data,'entries') || !json_cont($data,'orig_id') || !json_cont($data,'date')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
