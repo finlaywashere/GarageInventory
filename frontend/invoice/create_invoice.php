@@ -32,7 +32,6 @@
 			<label>Notes: </label><input id="notes" type="text"><br>
 			<label>Original ID: </label><input id="orig_id" type="text"><br>
 			<label>Date: </label><input id="date" type="date"></br>
-			<label>Paid Amount: </label><input id="paid" type="number" min="0"><br>
 			<button id="create">Create</button>
 			<button id="reset">Reset</button>
 			<p style="color: red;" id="error"></p>
@@ -103,7 +102,6 @@ var type = document.getElementById("type");
 var notes = document.getElementById("notes");
 var orig_id = document.getElementById("orig_id");
 var date = document.getElementById("date");
-var paid = document.getElementById("paid");
 var add = document.getElementById("add");
 var prodSearch = document.getElementById("prodSearch");
 var entries = document.getElementById("results");
@@ -243,7 +241,6 @@ function reset(){
 	notes.value = "";
 	orig_id.value = "";
 	date.value = "";
-	paid.value = "";
 	clearTable(entries);
 
 	csLType.selectedIndex = 0;
@@ -291,7 +288,6 @@ function create(){
 	map2["type"] = strip(type.value);
 	map2["subtotal"] = Math.floor(subtotal);
 	map2["total"] = Math.floor(subtotal * 1.13);
-	map2["paid"] = Math.floor(paid.value*100);
 	map2["orig_id"] = strip(orig_id.value);
 	map2["date"] = date.value;
 
