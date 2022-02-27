@@ -37,7 +37,6 @@
 			<h2>Entries</h2>
 			<table id="results">
 				<tr id="table_header">
-					<th>Entry ID</th>
 					<th>Product ID</th>
 					<th>Original ID</th>
 					<th>Product Name</th>
@@ -49,9 +48,20 @@
 					<th>Entry Total</th>
 				</tr>
 			</table>
+			<h2>Payments</h2>
+			<table id="payments">
+				<tr id="table_header">
+					<th>User</th>
+					<th>Amount</th>
+					<th>Type</th>
+					<th>Date</th>
+					<th>Identifier</th>
+				</tr>
+			</table>
 		</div>
 	</body>
 </html>
+<script src="/assets/js/master.js"></script>
 <script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
@@ -60,6 +70,7 @@ var param = document.getElementById("search_param");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
 var iTable = document.getElementById("invoice_table");
+var pTable = document.getElementById("payments");
 searchButton.addEventListener("click",search);
 
 var params = getSearchParameters();
@@ -97,43 +108,42 @@ function search(){
 	createElement(invoice.invoice['notes'],entry);
 	iTable.appendChild(entry);
 	
-	var entries = get_invoice_entries(param.value);
-	if(!entries.success){
-		console.log("Failed to retrieve data!");
-		error.innerHTML = "An error occurred while processing your request. Error: "+entries.reason;
-		return;
-	}
+	var entries = invoice.invoice['entries'];
 	var total = 0;
-	var invoices = entries.entries;
-	for(let i = 0; i < invoices.length; i++){
-		var entry = get_invoice_entry(invoices[i]);
-		if(!entry.success){
-			console.log("Failed to retrieve some data!");
-			error.innerHTML = "An error occurred while processing your request. Error: "+entry.reason;
-			return;
-		}
-		var product = get_product(entry.entry['product']);
+	for(let i = 0; i < entries.length; i++){
+		var entry = entries[i];
+		var product = get_product(entry['product']);
 		if(!product.success){
 			console.log("Failed to retrieve product name!");
 			error.innerHTML = "An error occurred while gathering product information! Error: "+product.reason;
 			return;
 		}
 		var tEntry = document.createElement("tr");
-		createElement(invoices[i],tEntry);
-		createElement(entry.entry['product'],tEntry);
-		createElement(entry.entry['original_id'],tEntry);
+		createElement(entry['product'],tEntry);
+		createElement(entry['original_id'],tEntry);
 		createElement(product.product['name'],tEntry);
-		createElement(entry.entry['count'],tEntry);
-		createElement(entry.entry['unit_count'],tEntry);
-		var price = entry.entry['unit_price'] / 100;
+		createElement(entry['count'],tEntry);
+		createElement(entry['unit_count'],tEntry);
+		var price = entry['unit_price'] / 100;
 		createElement("$"+price,tEntry);
-		var discount = entry.entry['unit_discount'] / 100;
+		var discount = entry['unit_discount'] / 100;
 		createElement("$"+discount,tEntry);
-		createElement(entry.entry['notes'],tEntry);
-		var lTotal = (entry.entry['count']/entry.entry['unit_count']*(price-discount));
+		createElement(entry['notes'],tEntry);
+		var lTotal = (entry['count']/entry['unit_count']*(price-discount));
 		createElement("$"+lTotal.toFixed(2), tEntry)
 		total += lTotal;
 		table.appendChild(tEntry);
+	}
+	var payments = invoice.invoice['payments'];
+	for(let i = 0; i < payments.length; i++){
+		var payment = payments[i];
+		var tEntry = document.createElement("tr");
+		createElement(payment['user'],tEntry);
+		createElement("$"+(payment['amount']/100).toFixed(2),tEntry);
+		createElement(payment_type_to_string(payment['type']),tEntry);
+		createElement(payment['date'],tEntry);
+		createElement(payment['identifier'],tEntry);
+		pTable.appendChild(tEntry);
 	}
 	if(total.toFixed(2) != subtotal.toFixed(2)){
 		error.innerHTML = "Warning: Subtotal does not equal sum of entries!";

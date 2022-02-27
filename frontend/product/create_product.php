@@ -26,6 +26,7 @@
 		</div>
 	</body>
 </html>
+<script src="/assets/js/master.js"></script>
 <script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 

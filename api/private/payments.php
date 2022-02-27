@@ -26,10 +26,29 @@ function payment_balance($invoice){
 	while($row = $result->fetch_assoc()){
 		$paid += $row['payment_amount'];
 	}
+	$conn->close();
 	if($paid < $total){
 		return $total-$paid;
 	}
 	return 0;
+}
+function get_payments($invoice){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return -1;
+	}
+	$stmt = $conn->prepare("SELECT * FROM payments WHERE invoice_id = ?;");
+	$stmt->bind_param("i",$invoice);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	
+	$ret = array();
+
+	while($row = $result->fetch_assoc()){
+		array_push($ret,array("user" => get_user($row['user_id'])['username'], "date" => $row['payment_date'], "amount" => $row['payment_amount'], "type" => $row['payment_type'], "identifier" => $row['payment_identifier']));
+	}
+	$conn->close();
+	return $ret;
 }
 
 /**
@@ -45,7 +64,7 @@ Payment types:
 
 */
 
-function payment_create($user, $invoice, $amount, $type, $customer, $identifier){
+function payment_create($user, $invoice, $amount, $type, $identifier){
 	$balance = payment_balance($invoice);
 	if($balance < $amount){
 		return 1;
@@ -54,8 +73,8 @@ function payment_create($user, $invoice, $amount, $type, $customer, $identifier)
 	if(!$conn){
 		return 2;
 	}
-	$stmt = $conn->prepare("INSERT INTO payments (user_id,invoice_id,payment_amount,payment_type,customer_id,payment_identifier) VALUES (?,?,?,?,?,?);");
-	$stmt->bind_param("iiiiis",$user,$invoice,$amount,$type,$customer,$identifier);
+	$stmt = $conn->prepare("INSERT INTO payments (user_id,invoice_id,payment_amount,payment_type,payment_identifier) VALUES (?,?,?,?,?);");
+	$stmt->bind_param("iiiis",$user,$invoice,$amount,$type,$identifier);
 	$stmt->execute();
 	$conn->close();
 	return 0;

@@ -1,12 +1,3 @@
-// From https://www.geeksforgeeks.org/how-to-include-a-javascript-file-in-another-javascript-file/
-function include(file) {
-	var script  = document.createElement('script');
-	script.src  = file;
-	script.type = 'text/javascript';
-	script.defer = true;
-	document.getElementsByTagName('head').item(0).appendChild(script); 
-}
-include('/assets/js/master.js');
 function invoice_type_to_string(type){
 	if(type === 0){
 		return "SYS";
@@ -75,13 +66,22 @@ function string_to_customer_type(str){
 		return -1;
 	}
 }
+function payment_type_to_string(type){
+	if(type == 0){
+		return "CASH";
+	}else if(type == 1){
+		return "CREDIT";
+	}else if(type == 2){
+		return "DEBIT";
+	}else if(type == 3){
+		return "CHEQUE";
+	}else if(type == 4){
+		return "ACCOUNT";
+	}else if(type == 5){
+		return "VIRTUAL";
+	}
+}
 
-function get_invoice_entries(id){
-	return json_request("/inventory/api/public/invoice/get_invoice_entries.php", "invoice_id="+id);
-}
-function get_invoice_entry(id){
-	return json_request("/inventory/api/public/invoice/get_invoice_entry.php", "entry_id="+id);
-}
 function get_product(id){
 	return json_request("/inventory/api/public/product/get_product.php", "product_id="+id);
 }
