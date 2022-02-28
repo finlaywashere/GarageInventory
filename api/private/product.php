@@ -24,6 +24,9 @@ function get_product($product_id){
 	$conn->close();
 	return $return;
 }
+function is_product($id){
+	return get_product($id) > 0;
+}
 /**
 	Gets the product id's of every product in the database (with search params)
 */

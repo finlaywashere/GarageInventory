@@ -2,6 +2,15 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
+/**
+
+Invoice types:
+0 = System
+1 = Incoming
+2 = Outgoing
+
+*/
+
 function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $orig_id, $date, $related=0, $due=NULL){
 	$conn = db_connect("inventory");
 	if(!$conn){

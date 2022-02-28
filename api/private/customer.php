@@ -20,13 +20,24 @@ function get_customer($id){
 	$conn->close();
 	return $return;
 }
+function is_customer($id){
+	return get_customer($id) > 0;
+}
+/**
+
+Customer types:
+0 = System
+1 = Normal
+2 = Business
+
+*/
 function create_customer($name, $email, $phone, $address, $type, $notes){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
 	$stmt = $conn->prepare("INSERT INTO `customers` (customer_name,customer_email,customer_phone,customer_address,customer_type,customer_notes) VALUES (?,?,?,?,?,?);");
-	$stmt->bind_param("ssssss",$name,$email,$phone,$address,$type,$notes);
+	$stmt->bind_param("ssssis",$name,$email,$phone,$address,$type,$notes);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
 	$stmt->execute();
@@ -41,9 +52,36 @@ function update_customer($id, $name, $email, $phone, $address, $type, $notes){
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("UPDATE `customers` SET customer_name=?,customer_email=?,customer_phone=?,customer_address=?,customer_type=?,customer_notes=? WHERe customer_id=?;");
-	$stmt->bind_param("ssssssi",$name,$email,$phone,$address,$type,$notes,$id);
-	$stmt->execute();
+	if($name != ""){
+		$stmt = $conn->prepare("UPDATE `customers` SET customer_name=? WHERE customer_id=?;");
+		$stmt->bind_param("si",$name,$id);
+		$stmt->execute();
+	}
+	if($email != ""){
+		$stmt = $conn->prepare("UPDATE `customers` SET customer_email=? WHERE customer_id=?;");
+		$stmt->bind_param("si",$email,$id);
+		$stmt->execute();
+	}
+	if($phone != ""){
+		$stmt = $conn->prepare("UPDATE `customers` SET customer_phone=? WHERE customer_id=?;");
+		$stmt->bind_param("si",$phone,$id);
+		$stmt->execute();
+	}
+	if($address != ""){
+		$stmt = $conn->prepare("UPDATE `customers` SET customer_address=? WHERE customer_id=?;");
+		$stmt->bind_param("si",$address,$id);
+		$stmt->execute();
+	}
+	if($type != -1){
+		$stmt = $conn->prepare("UPDATE `customers` SET customer_type=? WHERE customer_id=?;");
+		$stmt->bind_param("ii",$type,$id);
+		$stmt->execute();
+	}
+	if($notes != ""){
+		$stmt = $conn->prepare("UPDATE `customers` SET customer_notes=? WHERE customer_id=?;");
+		$stmt->bind_param("si",$notes,$id);
+		$stmt->execute();
+	}
 	$conn->close();
 }
 function customer_search($stype, $value, $offset, $limit){
@@ -55,7 +93,7 @@ function customer_search($stype, $value, $offset, $limit){
 	if($stype == 1){
 		// Search by name
 		$value = "%".$value."%";
-        $stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_name LIKE ? AND customer_id > ? LIMIT ?;");
+		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_name LIKE ? AND customer_id > ? LIMIT ?;");
 		$stmt->bind_param("sii",$value,$offset,$limit);
 	}else if($stype == 2){
 		// Search by phone

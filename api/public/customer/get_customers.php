@@ -19,7 +19,7 @@ if(req_param_i('search_offset')){
 if(req_param_i('search_limit')){
 	$limit = req_get('search_limit');
 }
-$stype = req_get('search_type');
+$stype = req_get('search_type'); // Type doesn't need to be validated because customer_search returns NULL with an invalid type
 $param = req_get('search_param');
 
 $customers = customer_search($stype, $param, $offset, $limit);

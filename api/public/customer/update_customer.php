@@ -7,16 +7,38 @@ $auth = authenticate_request(4);
 if(!$auth){
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!req_param_i('customer_id') || !req_param('name') || !req_param('email') || !req_param('phone') || !req_param('address') || !req_param_i('type') || !req_param('notes')){
-	die(json_encode(array('success' => false, 'reason' => 'invalid_customer')));
+if(!req_param_i('customer_id')){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
 $id = req_get('customer_id');
-$name = req_get('name');
-$email = req_get('email');
-$phone = req_get('phone');
-$address = req_get('address');
-$type = req_get('type');
-$notes = req_get('notes');
+$name = "";
+if(req_param('name')){
+	$name = req_get('name');
+	if(!validate_name($name))
+		die(json_encode(array('success' => false, 'reason' => 'invalid_name')));
+}
+$email = "";
+if(req_param('email')){
+	$email = req_get('email');
+}
+$phone = "";
+if(req_param('phone')){
+	$phone = req_get('phone');
+	if(!validate_phone($phone))
+		die(json_encode(array('success' => false, 'reason' => 'invalid_phone')));
+}
+$address = "";
+if(req_param('address'))
+	$address = req_get('address');
+$type = -1;
+if(req_param_i('type')){
+	$type = req_get('type');
+	if($type < 0 || type > 2)
+		die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
+}
+$notes = "";
+if(req_param('notes'))
+	$notes = req_get('notes');
 
 update_customer($id,$name,$email,$phone,$address,$type,$notes);
 
