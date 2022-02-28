@@ -34,15 +34,16 @@
 			<label>Date: </label><input id="date" type="date"></br>
 			<button id="create">Create</button>
 			<button id="reset">Reset</button>
-			<p style="color: red;" id="error"></p>
-			<p style="color: green" id="success"></p>
+			<p id="info"></p>
+			<button id="calculate">Calculate Totals</button>
 		</div>
 		<div class="content">
-			<button id="add">Add Row</button>
+			<button id="add">Add Entry</button>
 			<button id="prodSearch">Product Search</button>
 			<br>
-			<table id="results">
+			<table id="entries">
 				<tr id="table_header">
+					<th>Line</th>
 					<th>Product ID</th>
 					<th>Original ID</th>
 					<th>Count</th>
@@ -50,6 +51,18 @@
 					<th>Unit Price</th>
 					<th>Unit Discount</th>
 					<th>Notes</th>
+				</tr>
+			</table>
+			<br>
+			<button id="addPayment">Add Payment</button>
+			<label for="taxexempt">Tax Exempt</label>
+			<input type="checkbox" id="taxexempt" value="Tax Exempt">
+			<table id="payments">
+				<tr id="table_header">
+					<th>Line</th>
+					<th>Type</th>
+					<th>Amount</th>
+					<th>Identifier</th>
 				</tr>
 			</table>
 		</div>
@@ -83,6 +96,16 @@
 			<p style="color: red;" id="prLError"></p>
 			<div id="prLResults"></div>
 		</div>
+		<div id="confirm" class="floating">
+			<h2>Are you sure you would like to continue?</h2>
+			<p id="confirminfo"></p>
+			<h2>Warnings:</h2>
+			<p id="warningsdata"></p>
+			<button id="continue">Continue</button>
+			<button id="cancel">Cancel</button>
+			<p style="color: red;" id="error"></p>
+			<p style="color: green" id="success"></p>
+		</div>
 	</body>
 </html>
 <script src="/assets/js/master.js"></script>
@@ -105,10 +128,10 @@ var orig_id = document.getElementById("orig_id");
 var date = document.getElementById("date");
 var add = document.getElementById("add");
 var prodSearch = document.getElementById("prodSearch");
-var entries = document.getElementById("results");
+var entries = document.getElementById("entries");
 
 add.addEventListener("click",addRow);
-createButton.addEventListener("click",create);
+createButton.addEventListener("click",showConfirm);
 resetButton.addEventListener("click",reset);
 prodSearch.addEventListener("click",productLookup);
 cusLookup.addEventListener("click",customerLookup);
@@ -133,6 +156,26 @@ var prLResults = document.getElementById("prLResults");
 
 prLSearch.addEventListener("click",productSearch);
 prLClose.addEventListener("click",productLookupClose);
+
+var infoText = document.getElementById("info");
+var calculateButton = document.getElementById("calculate");
+var taxExempt = document.getElementById("taxexempt");
+var payments = document.getElementById("payments");
+var addPayment = document.getElementById("addPayment");
+
+calculateButton.addEventListener("click",updateTotal);
+addPayment.addEventListener("click",addPaymentRow);
+
+var confirmDiv = document.getElementById("confirm");
+var confirmInfo = document.getElementById("confirminfo");
+var warningsData = document.getElementById("warningsdata");
+var continueButton = document.getElementById("continue");
+var cancelButton = document.getElementById("cancel");
+
+continueButton.addEventListener("click",create);
+cancelButton.addEventListener("click",closeConfirm);
+
+updateTotal();
 
 function customerSearch(){
 	var customers = get_customers(csLType.value,csLParam.value);
@@ -184,6 +227,62 @@ function customerLookupClose(){
 function customerLookup(){
 	cusLookupDiv.style.visibility = "visible";
 }
+function showConfirm(){
+	// Info to display to the user before confirming
+	var subtotal = getSubtotal();
+	var total = getTotal(subtotal);
+	var pTotal = getPaymentTotal();
+	confirmInfo.innerHTML = "Subtotal: "+subtotal+"<br>Total: "+total+"<br>Payment Total: "+pTotal;
+	// Show all warnings for missing data / errors / things to double check
+	var warn = "";
+	if(taxexempt.checked){
+		warn += "Transaction is tax exempt!<br>";
+	}
+	const today = new Date();
+	if(date.value == ""){
+		warn += "Transaction has no date!<br>";
+	}else{
+		var split = date.value.split("-");
+		var d = today.getDate();
+		var m = today.getMonth()+1;
+		var y = today.getFullYear();
+		if(!(split[2] == d && split[1] == m && split[0] == y)){
+			warn += "Transaction is not from today!<br>";
+		}
+	}
+	var count = 0;
+	for(var i = 0; i < entries.childNodes.length; i++){
+		var child = entries.childNodes[i];
+		if(child.nodeName == "TR"){
+			count++;
+			var columns = child.childNodes;
+			var line = strip(columns[0].innerHTML);
+			if(strip(columns[1].innerHTML) == ""){
+				warn += "Line "+line+" Error: Invalid product id<br>";
+			}
+			if(strip(columns[2].innerHTML) == ""){
+				warn += "Line "+line+" Warning: No original id<br>";
+			}
+			if(strip(columns[3].innerHTML) == "" || strip(columns[3].innerHTML) < 1){
+				warn += "Line "+line+" Error: Invalid count<br>";
+			}
+			if(strip(columns[4].innerHTML) == "" || strip(columns[4].innerHTML) < 1){
+				warn += "Line "+line+" Error: Invalid unit count<br>";
+			}
+			if(strip(columns[5].innerHTML) == "" || strip(columns[5].innerHTML) < 0){
+				warn += "Line "+line+" Error: Invalid unit price<br>";
+			}
+		}
+	}
+	if(count == 0){
+		warn += "No entries in invoice!<br>";
+	}
+	warningsData.innerHTML = warn;
+	confirmDiv.style.visibility = "visible";
+}
+function closeConfirm(){
+	confirmDiv.style.visibility = "hidden";
+}
 function productSearch(){
 	var products = get_products(prLType.value,prLParam.value);
 	if(!products.success){
@@ -222,16 +321,73 @@ function productLookup(){
 function productLookupClose(){
 	prodLookupDiv.style.visibility = "hidden";
 }
-
+var line = 0;
 function addRow(){
+	line++;
 	var r = document.createElement("tr");
-	for(var i = 0; i < 7; i++){
+	for(var i = 0; i < 8; i++){
 		var tmp = document.createElement("td");
-		tmp.setAttribute("contenteditable","true");
-		tmp.innerHTML = "";
+		if(i != 0)
+			tmp.setAttribute("contenteditable","true");
+		if(i == 0){
+			tmp.innerHTML = line;
+		}else if(i == 3 || i == 4){
+			tmp.innerHTML = "0";
+		}else if(i == 5 || i == 6){
+			tmp.innerHTML = "$0.00";
+		}else{
+			tmp.innerHTML = "";
+		}
 		r.appendChild(tmp);
 	}
 	entries.appendChild(r);
+}
+var pLine = 0;
+function addPaymentRow(){
+	pLine++;
+	var r = document.createElement("tr");
+	for(var i = 0; i < 4; i++){
+		var tmp = document.createElement("td");
+		if(i > 1){
+			tmp.setAttribute("contenteditable","true");
+			if(i == 1){
+				tmp.innerHTML = "$0.00";
+			}else{
+				tmp.innerHTML = "";
+			}
+		}else if (i == 1){
+			var dropdown = document.createElement("select");
+			var cash = document.createElement("option");
+			cash.value = "0";
+			cash.innerHTML = "CASH";
+			dropdown.appendChild(cash);
+			var credit = document.createElement("option");
+			credit.value = "1";
+			credit.innerHTML = "CREDIT";
+			dropdown.appendChild(credit);
+			var debit = document.createElement("option");
+			debit.value = "2";
+			debit.innerHTML = "DEBIT";
+			dropdown.appendChild(debit);
+			var cheque = document.createElement("option");
+			cheque.value = "3";
+			cheque.innerHTML = "CHEQUE";
+			dropdown.appendChild(cheque);
+			var acc = document.createElement("option");
+			acc.value = "4";
+			acc.innerHTML = "ACCOUNT";
+			dropdown.appendChild(acc);
+			var virt = document.createElement("option");
+			virt.value = "5";
+			virt.innerHTML = "VIRTUAL";
+			dropdown.appendChild(virt);
+			tmp.appendChild(dropdown);
+		}else if (i == 0){
+			tmp.innerHTML = pLine;
+		}
+		r.appendChild(tmp);
+	}
+	payments.appendChild(r);
 }
 function reset(){
 	error.innerHTML = "";
@@ -243,6 +399,7 @@ function reset(){
 	orig_id.value = "";
 	date.value = "";
 	clearTable(entries);
+	clearTable(payments);
 
 	csLType.selectedIndex = 0;
 	csLParam.value = "";
@@ -250,9 +407,62 @@ function reset(){
 	prLType.selectedIndex = 0;
 	prLParam.value = "";
 	prLResults.innerHTML = "";
+	
+	taxexempt.checked = false;
+	updateTotal();
+}
+
+function getSubtotal(){
+	var subtotal = 0.00;
+	for(var i = 0; i < entries.childNodes.length; i++){
+		var child = entries.childNodes[i];
+		if(child.nodeName == "TR"){
+			var columns = child.childNodes;
+			var count = strip(columns[3].innerHTML);
+			var unit_count = strip(columns[4].innerHTML);
+			var price = strip(columns[5].innerHTML);
+			if(price.startsWith("$"))
+				price = price.substring(1);
+			var discount = strip(columns[6].innerHTML);
+			if(discount.startsWith("$"))
+				discount = discount.substring(1);
+			var tmpTotal = count/unit_count * (price - discount);
+			subtotal += tmpTotal;
+		}
+	}
+	subtotal = subtotal.toFixed(2);
+	return subtotal;
+}
+function getPaymentTotal(){
+	var pTotal = 0.00;
+	for(var i = 0; i < payments.childNodes.length; i++){
+		var child = payments.childNodes[i];
+		if(child.nodeName == "TR"){
+			var map = {};
+			var columns = child.childNodes;
+			pTotal += strip(columns[2].innerHTML) * 1.00;
+		}
+	}
+	pTotal = pTotal.toFixed(2);
+	return pTotal;
+}
+function getTotal(subtotal){
+	var total = taxexempt.checked ? subtotal * 1.00 : subtotal * 1.13;
+	total = total.toFixed(2);
+	return total;
+}
+function updateTotal(){
+	var subtotal = getSubtotal();
+	var pTotal = getPaymentTotal();
+	var total = getTotal(subtotal);
+	info.innerHTML = "Subtotal: "+subtotal+"<br>Total: "+total+"<br>Payment Total: "+pTotal;
 }
 
 function create(){
+	if(Math.abs(getTotal(getSubtotal()) - getPaymentTotal()) > 0.02){
+		error.innerHTML = "Unable to continue: totals do not match!";
+		return;
+	}
 	error.innerHTML = "";
 	success.innerHTML = "";
 	var rows = [];
@@ -262,33 +472,48 @@ function create(){
 		if(child.nodeName == "TR"){
 			var map = {};
 			var columns = child.childNodes;
-			map["product"] = strip(columns[0].innerHTML);
-			map["orig"] = strip(columns[1].innerHTML);
-			map["count"] = strip(columns[2].innerHTML);
-			map["unit_count"] = strip(columns[3].innerHTML);
-			var price = strip(columns[4].innerHTML);
+			map["product"] = strip(columns[1].innerHTML);
+			map["orig"] = strip(columns[2].innerHTML);
+			map["count"] = strip(columns[3].innerHTML);
+			map["unit_count"] = strip(columns[4].innerHTML);
+			var price = strip(columns[5].innerHTML);
 			if(price.startsWith("$"))
 				price = price.substring(1);
 			price *= 100;
 			map["unit_price"] = Math.floor(price);
-			var discount = strip(columns[5].innerHTML);
+			var discount = strip(columns[6].innerHTML);
 			if(discount.startsWith("$"))
 				discount = discount.substring(1);
 			discount *= 100;
 			map["unit_discount"] = discount;
-			map["notes"] = strip(columns[6].innerHTML);
+			map["notes"] = strip(columns[7].innerHTML);
 			var lTotal = map['count'] / map['unit_count'] * (price - discount);
 			subtotal += lTotal;
 			rows.push(map);
 		}
 	}
+	var rows2 = [];
+	var pTotal = 0;
+	for(var i = 0; i < payments.childNodes.length; i++){
+		var child = payments.childNodes[i];
+		if(child.nodeName == "TR"){
+			var map = {};
+			var columns = child.childNodes;
+			map["type"] = columns[1].childNodes[0].value;
+			map["amount"] = strip(columns[2].innerHTML)*100;
+			map["identifier"] = strip(columns[3].innerHTML);
+			pTotal += map["amount"];
+			rows2.push(map);
+		}
+	}
 	var map2 = {};
 	map2["entries"] = rows;
+	map2["payments"] = rows2;
 	map2["customer"] = strip(customer.value);
 	map2["notes"] = strip(notes.value);
 	map2["type"] = strip(type.value);
 	map2["subtotal"] = Math.floor(subtotal);
-	map2["total"] = Math.floor(subtotal * 1.13);
+	map2["total"] = Math.floor(taxexempt.checked ? subtotal * 1.00 : subtotal * 1.13);
 	map2["orig_id"] = strip(orig_id.value);
 	map2["date"] = date.value;
 
