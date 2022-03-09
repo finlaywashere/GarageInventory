@@ -7,7 +7,7 @@ function product_report(int $id, $user){
 	if(!$product){
 		return 0;
 	}
-	$invoices = invoice_product_search($id);
+	$invoices = invoice_product_search($id, 50); // Get most recent 50 invoices
 	$title = "Product Report for #".$id;
 	$body = $product['name']." - ".$product['description']." - ".$product['count']." on hand\nLocation: ".$product['location']."\nNotes: ".$product['notes']."\n\n";
 	$body .= "Invoices for item:\n";
@@ -36,6 +36,77 @@ function product_report(int $id, $user){
 			}
 		}
 		$body .= $count."\n";
+	}
+	return create_report($user, $title, html_encode($body), 0, 0);
+}
+function customer_report($user){
+	$date = date("Y-m-d");
+	$title = "Customer Report for ".$date;
+	$customers = get_customers_from_date($date);
+	$body = "New Customers\n";
+	$body .= "ID\tName\tType\n";
+	for($i = 0; $i < count($customers); $i++){
+		$customer = get_customer($customers[$i]);
+		$type = "";
+		$typeI = $customer['type'];
+		if($typeI == 0){
+			$type = "SYSTEM";
+		}else if($typeI == 1){
+			$type = "NORMAL";
+		}else if($typeI == 2){
+			$type = "BUSINESS";
+		}else{
+			$type = "UNKNOWN";
+		}
+		$body .= $customers[$i]."\t".$customer['name']."\t".$type."\n";
+	}
+	$body .= "\nSpending by Customer\n";
+	$body .= "ID\tName\tIn\tOut\tSys\tTotal\n";
+	$invoices = get_invoices_from_date($date);
+	$incoming = array();
+	$outgoing = array();
+	$system = array();
+	$custs = array();
+	for($i = 0; $i < count($invoices); $i++){
+		$inv = get_invoice($invoices[$i]);
+		$total = $inv['total'];
+		$type = $inv['type'];
+		$id = $inv['customer'];
+		array_push($custs,$id);
+		if(!isset($system[$id])){
+			$system[$id] = 0;
+			$incoming[$id] = 0;
+			$outgoing[$id] = 0;
+		}
+		if($type == 0){
+			$system[$id] += $total;
+		}else if($type == 1){
+			$incoming[$id] += $total;
+		}else if($type == 2){
+			$outgoing[$id] += $total;
+		}
+	}
+	$custs = array_unique($custs);
+	for($i = 0; $i < count($custs); $i++){
+		$id = $custs[$i];
+		$customer = get_customer($id);
+		
+		$inc = 0;
+		if(isset($incoming[$id]))
+			$inc = $incoming[$id];
+		$out = 0;
+		if(isset($outgoing[$id]))
+			$out = $outgoing[$id];
+		$sys = 0;
+		if(isset($system[$id]))
+			$sys = $system[$id];
+		// Calculate total amount of money COMING IN to the system
+		$tot = $out + $sys - $inc;
+		$inc = ($inc / 100);
+		$out = ($out / 100);
+		$sys = ($sys / 100);
+		$tot = ($tot / 100);
+		$body .= $id."\t".$customer['name']."\t".$inc."\t".$out."\t".$sys."\t".$tot."\n";
 	}
 	return create_report($user, $title, html_encode($body), 0, 0);
 }

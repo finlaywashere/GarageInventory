@@ -15,13 +15,32 @@ function get_customer($id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("notes" => $row['customer_notes'], "name" => $row['customer_name'], "email" => $row['customer_email'], "phone" => $row['customer_phone'], "address" => $row['customer_address'], "type" => $row['customer_type']);
+	$return = array("notes" => $row['customer_notes'], "name" => $row['customer_name'], "email" => $row['customer_email'], "phone" => $row['customer_phone'], "address" => $row['customer_address'], "type" => $row['customer_type'], "creation" => $row['customer_creation']);
 
 	$conn->close();
 	return $return;
 }
 function is_customer($id){
 	return get_customer($id) > 0;
+}
+function get_customers_from_date($date){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE DATE(customer_creation) = ?;");
+	$stmt->bind_param("s",$date);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	if(!mysqli_num_rows($result)){
+		return array();
+	}
+	$return = array();
+	while($row = $result->fetch_assoc()){
+		array_push($return,$row['customer_id']);
+	}
+	$conn->close();
+	return $return;
 }
 /**
 
