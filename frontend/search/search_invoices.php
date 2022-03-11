@@ -53,6 +53,7 @@ var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
 function search(){
+	error.innerHTML = "";
 	var invoicesJ = get_invoices(type.value,param.value);
 	if(!invoicesJ.success){
 		console.log("Failed to retrieve data!");

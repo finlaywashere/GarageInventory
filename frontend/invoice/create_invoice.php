@@ -228,6 +228,7 @@ function customerLookup(){
 	cusLookupDiv.style.visibility = "visible";
 }
 function showConfirm(){
+	error.innerHTML = "";
 	// Info to display to the user before confirming
 	var subtotal = getSubtotal();
 	var total = getTotal(subtotal);
@@ -480,11 +481,12 @@ function create(){
 			if(price.startsWith("$"))
 				price = price.substring(1);
 			price *= 100;
-			map["unit_price"] = Math.floor(price);
+			map["unit_price"] = Math.round(price);
 			var discount = strip(columns[6].innerHTML);
 			if(discount.startsWith("$"))
 				discount = discount.substring(1);
 			discount *= 100;
+			discount = Math.round(discount);
 			map["unit_discount"] = discount;
 			map["notes"] = strip(columns[7].innerHTML);
 			var lTotal = map['count'] / map['unit_count'] * (price - discount);

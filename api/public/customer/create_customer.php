@@ -27,7 +27,7 @@ if($email != "" && !validate_email($email)){
 if($type == 0 && !authenticate_request(100)){
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if($type < 0 || type > 2){
+if($type < 0 || $type > 2){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
 }
 if(!validate_phone($phone)){

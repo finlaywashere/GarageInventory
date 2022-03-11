@@ -21,14 +21,13 @@ Invoice status:
 
 */
 
-function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $orig_id, $date, $related=0, $due=NULL, $flags=NULL, $status=0){
+function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $orig_id, $date, $payments, $user, $related=0, $due=NULL, $flags=NULL, $status=0){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
-	
-	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes, original_id, invoice_date, invoice_related, invoice_due, invoice_flags,invoice_status) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-	$stmt->bind_param("iiiisssisii",$subtotal,$total,$customer,$type,$notes,$orig_id,$date,$related,$due,$flags,$status);
+	$stmt = $conn->prepare("INSERT INTO invoices (invoice_subtotal, invoice_total, customer_id, invoice_type, invoice_notes, original_id, invoice_date, invoice_related, invoice_due, invoice_flags, invoice_status, invoice_user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+	$stmt->bind_param("iiiisssisiii",$subtotal,$total,$customer,$type,$notes,$orig_id,$date,$related,$due,$flags,$status,$user);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
 	$stmt->execute();
@@ -54,6 +53,12 @@ function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $
 		$stmt->bind_param("iisiiisii",$id,$product,$orig,$count,$unit_count,$unit_price,$notes,$discount,$due_count);
 		$stmt->execute();
 		adjust_stock($product,$count);
+	}
+	for($i = 0; $i < count($payments); $i++){
+		$type = $payments[$i]->{'type'};
+		$amount = $payments[$i]->{'amount'};
+		$identifier = $payments[$i]->{'identifier'};
+		payment_create($user,$id,$amount,$type,$identifier);
 	}
 
 	$conn->close();
