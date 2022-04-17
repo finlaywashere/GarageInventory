@@ -502,7 +502,7 @@ function create(){
 			var map = {};
 			var columns = child.childNodes;
 			map["type"] = columns[1].childNodes[0].value;
-			map["amount"] = strip(columns[2].innerHTML)*100;
+			map["amount"] = Math.round(strip(columns[2].innerHTML)*100);
 			map["identifier"] = strip(columns[3].innerHTML);
 			pTotal += map["amount"];
 			rows2.push(map);
@@ -514,8 +514,8 @@ function create(){
 	map2["customer"] = strip(customer.value);
 	map2["notes"] = strip(notes.value);
 	map2["type"] = strip(type.value);
-	map2["subtotal"] = Math.floor(subtotal);
-	map2["total"] = Math.floor(taxexempt.checked ? subtotal * 1.00 : subtotal * 1.13);
+	map2["subtotal"] = Math.round(subtotal);
+	map2["total"] = Math.round(taxexempt.checked ? subtotal * 1.00 : subtotal * 1.13);
 	map2["orig_id"] = strip(orig_id.value);
 	map2["date"] = date.value;
 

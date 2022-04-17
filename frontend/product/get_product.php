@@ -21,6 +21,7 @@
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
+			<h2>Product Information</h2>
 			<table id="results" style="width: 80%;">
 				<tr id="table_header">
 					<th>Name</th>
@@ -28,6 +29,16 @@
 					<th>Count</th>
 					<th>Notes</th>
 					<th>Location</th>
+				</tr>
+			</table><br>
+			<h2>History</h2>
+			<table id="table_history" style="width: 80%;">
+				<tr id="table_header">
+					<th>Type</th>
+					<th>Price</th>
+					<th>Date</th>
+					<th>Invoice</th>
+					<th>Customer</th>
 				</tr>
 			</table>
 		</div>
@@ -42,6 +53,7 @@ var saveButton = document.getElementById("save");
 var param = document.getElementById("search_param");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
+var t_history = document.getElementById("table_history");
 
 var nameH = null;
 var desc = null;
@@ -75,6 +87,7 @@ function save(){
 function search(){
 	var json = get_product(param.value);
 	clearTable(table);
+	clearTable(t_history);
 	error.innerHTML = "";
 	if(!json.success){
 		console.log("Failed to retrieve data!");
@@ -88,6 +101,21 @@ function search(){
 	notes = createEditableElement(json.product['notes'],entry);
 	loc = createEditableElement(json.product['location'],entry);
 	table.appendChild(entry);
+	var entryMin = document.createElement("tr");
+	createElement("Min",entryMin);
+	createElement("$"+json.product.history.min['price']/100,entryMin);
+	createElement(json.product.history.min['date'],entryMin);
+	createElement(json.product.history.min['invoice'],entryMin);
+	createElement(json.product.history.min['customer'],entryMin);
+	t_history.appendChild(entryMin);
+	var entryMax = document.createElement("tr");
+	createElement("Max",entryMax);
+	createElement("$"+json.product.history.max['price']/100,entryMax);
+	createElement(json.product.history.max['date'],entryMax);
+	createElement(json.product.history.max['invoice'],entryMax);
+	createElement(json.product.history.max['customer'],entryMax);
+	t_history.appendChild(entryMax);
+
 	pid = param.value;
 }
 

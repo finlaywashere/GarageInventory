@@ -19,9 +19,44 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes']);
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes'], "history" => get_product_history($product_id));
 
 	$conn->close();
+	return $return;
+}
+
+function get_product_history($id){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT `unit_count`,`entry_unit_price`,`entry_discount`,`invoice_id` FROM `invoice_entries` WHERE `product_id` = ?;");
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+
+	$result = $stmt->get_result();
+	if(!mysqli_num_rows($result)){
+		return 0;
+	}
+	
+	$max = 0;
+	$maxi = 0;
+	$mini = 0;
+	$min = 9999999999;
+	while($row = $result->fetch_assoc()){
+		$price = $row['entry_unit_price']-$row['entry_discount'];
+		$price = (int) $price/$row['unit_count'];
+		if($price > $max){
+			$max = $price;
+			$maxi = $row['invoice_id'];
+		}else if($price < $min){
+			$min = $price;
+			$mini = $row['invoice_id'];
+		}
+    }
+	$maxinv = get_invoice($maxi);
+	$mininv = get_invoice($mini);
+	$return = array('max' => array('price' => $max, 'date' => $maxinv['date'], 'invoice' => $maxi, 'customer' => $maxinv['customer']), 'min' => array('price' => $min, 'date' => $mininv['date'], 'invoice' => $mini, 'customer' => $mininv['customer']));
 	return $return;
 }
 function is_product($id){
