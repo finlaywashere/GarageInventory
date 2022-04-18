@@ -56,6 +56,7 @@
 					<th>Type</th>
 					<th>Date</th>
 					<th>Identifier</th>
+					<th>Notes</th>
 				</tr>
 			</table>
 		</div>
@@ -143,6 +144,7 @@ function search(){
 		createElement(payment_type_to_string(payment['type']),tEntry);
 		createElement(payment['date'],tEntry);
 		createElement(payment['identifier'],tEntry);
+		createElement(payment['notes'],tEntry);
 		pTable.appendChild(tEntry);
 	}
 	if(total.toFixed(2) != subtotal.toFixed(2)){

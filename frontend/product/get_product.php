@@ -94,6 +94,12 @@ function search(){
 		error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
 		return;
 	}
+	var hist = get_product_history(param.value);
+	if(!hist.success){
+		console.log("Failed to retrieve history!");
+		error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
+		return;
+	}
 	var entry = document.createElement("tr");
 	nameH = createEditableElement(json.product['name'],entry);
 	desc = createEditableElement(json.product['description'],entry);
@@ -103,17 +109,19 @@ function search(){
 	table.appendChild(entry);
 	var entryMin = document.createElement("tr");
 	createElement("Min",entryMin);
-	createElement("$"+json.product.history.min['price']/100,entryMin);
-	createElement(json.product.history.min['date'],entryMin);
-	createElement(json.product.history.min['invoice'],entryMin);
-	createElement(json.product.history.min['customer'],entryMin);
+	createElement("$"+hist.history.min['price']/100,entryMin);
+	createElement(hist.history.min['date'],entryMin);
+	createElement(hist.history.min['invoice'],entryMin);
+	var cid = hist.history.min.customer['id'];
+	createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.min.customer['name']+"</a>",entryMin);
 	t_history.appendChild(entryMin);
 	var entryMax = document.createElement("tr");
 	createElement("Max",entryMax);
-	createElement("$"+json.product.history.max['price']/100,entryMax);
-	createElement(json.product.history.max['date'],entryMax);
-	createElement(json.product.history.max['invoice'],entryMax);
-	createElement(json.product.history.max['customer'],entryMax);
+	createElement("$"+hist.history.max['price']/100,entryMax);
+	createElement(hist.history.max['date'],entryMax);
+	createElement(hist.history.max['invoice'],entryMax);
+	var cid = hist.history.max.customer['id'];
+	createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.max.customer['name']+"</a>",entryMax);
 	t_history.appendChild(entryMax);
 
 	pid = param.value;

@@ -85,6 +85,9 @@ function payment_type_to_string(type){
 function get_product(id){
 	return json_request("/inventory/api/public/product/get_product.php", "product_id="+id);
 }
+function get_product_history(id){
+	return json_request("/inventory/api/public/product/product_history.php", "product_id="+id);
+}
 function get_invoice(id){
 	return json_request("/inventory/api/public/invoice/get_invoice.php", "invoice_id="+id);
 }
@@ -123,4 +126,7 @@ function create_product(name,desc,notes,loc){
 }
 function adjust_inventory(id,count,notes){
 	return json_request("/inventory/api/public/product/adjust_inventory.php", "product_id="+id+"&count="+count+"&notes="+encode(notes));
+}
+function get_accounts(){
+	return json_request("/inventory/api/public/payments/get_accounts.php","");
 }

@@ -49,7 +49,7 @@ if($type == 0 && !authenticate_request(100)){
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 for($i = 0; $i < count($entries); $i++){
-	if(!json_cont_i($entries[$i],'product') || !json_cont_i($entries[$i],'orig') || !json_cont_i($entries[$i],'count') || !json_cont_i($entries[$i],'unit_count') || !json_cont_i($entries[$i],'unit_price') || !json_cont_i($entries[$i],'unit_discount') || !json_cont($entries[$i],'notes')){
+	if(!json_cont_i($entries[$i],'product') || !json_cont($entries[$i],'orig') || !json_cont_i($entries[$i],'count') || !json_cont_i($entries[$i],'unit_count') || !json_cont_i($entries[$i],'unit_price') || !json_cont_i($entries[$i],'unit_discount') || !json_cont($entries[$i],'notes')){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	if(json_cont($entries[$i],'due')){
@@ -60,22 +60,84 @@ for($i = 0; $i < count($entries); $i++){
 		$entries[$i]->{'due'} = 0;
 	}
 	$product = json_get($entries[$i],'product');
+	if(!get_product($product)){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+	}
 	$orig = json_get($entries[$i],'orig');
 	$count = json_get($entries[$i],'count');
+	if($count < 0 || $count == 0){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+	}
 	$unit_count = json_get($entries[$i],'unit_count');
+	if($unit_count < 0 || $unit_count == 0){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+	}
 	$price = json_get($entries[$i],'unit_price');
+	if($price < 0 || $price == 0){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+	}
 	$discount = json_get($entries[$i],'unit_discount');
 	$enotes = json_get($entries[$i],'notes');
 	$edue = json_get($entries[$i],'due');
 	$entries[$i]->{'notes'} = sanitize($entries[$i]->{'notes'});
 }
+$ptotal = 0;
 for($i = 0; $i < count($payments); $i++){
-	if(!json_cont_i($payments[$i],'type') || !json_cont_i($payments[$i],'amount') || !json_cont($payments[$i],'identifier')){
+	if(!json_cont_i($payments[$i],'type') || !json_cont_i($payments[$i],'amount') || !json_cont($payments[$i],'identifier') || !json_cont($payments[$i],'notes')){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
+	// Payment types:
+	// 0 - Cash
+	// 1 - Credit
+	// 2 - Debit
+	// 3 - Cheque
+	// 4 - Account
+	// 5 - Virtual
+
 	$ptype = json_get($payments[$i],'type');
+	if($ptype < 0 || $ptype > 5){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+	}
 	$amount = json_get($payments[$i],'amount');
+	if($amount < 0 || $amount == 0){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+	}
 	$ident = json_get($payments[$i],'identifier');
+	$notes = json_get($payments[$i],'notes');
+	$ptotal += $amount;
+	if($ptype == 4){
+		$accounts = get_accounts();
+		if(!isset($accounts[$ident])){
+			die(json_encode(array('success' => false, 'reason' => 'invalid_account')));
+		}
+		$acc = $accounts[$ident];
+		if(!authenticate_request($acc['perms'])){
+			die(json_encode(array('success' => false, 'reason' => 'invalid_account')));
+		}
+		if($notes == ""){
+			$nospaces = preg_replace("/[^A-Za-z0-9]/","",$notes);
+			$len = strlen($nospaces);
+			if($len < 5){
+				die(json_encode(array('success' => false, 'reason' => 'invalid_notes')));
+			}
+		}
+	}
+	if($ptype != 0){
+		$nospaces = preg_replace("/[^A-Za-z0-9]/","",$ident);
+		$len = strlen($nospaces);
+		if($ptype > 3){
+			if($len < 1){
+				die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+			}
+		}else{
+			if($len < 4){
+				die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+			}
+		}
+	}
+}
+if($ptotal != $total){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
 }
 
 $invoice = invoice_create($subtotal,$total,$customer,$type,$notes,$entries,$orig_id,$date,$payments,get_user_id(get_username()));

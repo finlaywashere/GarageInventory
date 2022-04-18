@@ -58,7 +58,8 @@ function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $
 		$type = $payments[$i]->{'type'};
 		$amount = $payments[$i]->{'amount'};
 		$identifier = $payments[$i]->{'identifier'};
-		payment_create($user,$id,$amount,$type,$identifier);
+		$notes = $payments[$i]->{'notes'};
+		payment_create($user,$id,$amount,$type,$identifier,$notes);
 	}
 
 	$conn->close();

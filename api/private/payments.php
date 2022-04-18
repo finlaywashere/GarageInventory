@@ -45,7 +45,25 @@ function get_payments($invoice){
 	$ret = array();
 
 	while($row = $result->fetch_assoc()){
-		array_push($ret,array("user" => get_user($row['user_id'])['username'], "date" => $row['payment_date'], "amount" => $row['payment_amount'], "type" => $row['payment_type'], "identifier" => $row['payment_identifier']));
+		array_push($ret,array("user" => get_user($row['user_id'])['username'], "date" => $row['payment_date'], "amount" => $row['payment_amount'], "type" => $row['payment_type'], "identifier" => $row['payment_identifier'], "notes" => $row['payment_notes']));
+	}
+	$conn->close();
+	return $ret;
+}
+
+function get_accounts(){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT * FROM accounts WHERE 1;");
+	$stmt->execute();
+
+	$result = $stmt->get_result();
+	$ret = array();
+
+	while($row = $result->fetch_assoc()){
+		$ret[$row['account_id']] = array("name" => $row['account_name'], "perms" => $row['account_perms'], "desc" => $row['account_desc']);
 	}
 	$conn->close();
 	return $ret;
@@ -64,17 +82,27 @@ Payment types:
 
 */
 
-function payment_create($user, $invoice, $amount, $type, $identifier){
+function payment_create($user, $invoice, $amount, $type, $identifier, $notes=""){
 	$balance = payment_balance($invoice);
 	if($balance < $amount){
 		return 1;
 	}
+	if($type == 4){
+		$accounts = get_accounts();
+		if(!isset($accounts[$identifier])){
+			return 3;
+		}
+		if($notes == ""){
+			return 4;
+		}
+	}
+	//TODO: Implement virtual accounts (moving money between invoices)
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 2;
 	}
-	$stmt = $conn->prepare("INSERT INTO payments (user_id,invoice_id,payment_amount,payment_type,payment_identifier) VALUES (?,?,?,?,?);");
-	$stmt->bind_param("iiiis",$user,$invoice,$amount,$type,$identifier);
+	$stmt = $conn->prepare("INSERT INTO payments (user_id,invoice_id,payment_amount,payment_type,payment_identifier,payment_notes) VALUES (?,?,?,?,?,?);");
+	$stmt->bind_param("iiiiss",$user,$invoice,$amount,$type,$identifier,$notes);
 	$stmt->execute();
 	$conn->close();
 	return 0;

@@ -19,7 +19,7 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes'], "history" => get_product_history($product_id));
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes']);
 
 	$conn->close();
 	return $return;
@@ -56,7 +56,7 @@ function get_product_history($id){
     }
 	$maxinv = get_invoice($maxi);
 	$mininv = get_invoice($mini);
-	$return = array('max' => array('price' => $max, 'date' => $maxinv['date'], 'invoice' => $maxi, 'customer' => $maxinv['customer']), 'min' => array('price' => $min, 'date' => $mininv['date'], 'invoice' => $mini, 'customer' => $mininv['customer']));
+	$return = array('max' => array('price' => $max, 'date' => $maxinv['date'], 'invoice' => $maxi, 'customer' => get_customer($maxinv['customer'])), 'min' => array('price' => $min, 'date' => $mininv['date'], 'invoice' => $mini, 'customer' => get_customer($mininv['customer'])));
 	return $return;
 }
 function is_product($id){

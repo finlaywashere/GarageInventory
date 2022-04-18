@@ -15,7 +15,7 @@ function get_customer($id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("notes" => $row['customer_notes'], "name" => $row['customer_name'], "email" => $row['customer_email'], "phone" => $row['customer_phone'], "address" => $row['customer_address'], "type" => $row['customer_type'], "creation" => $row['customer_creation']);
+	$return = array("notes" => $row['customer_notes'], "name" => $row['customer_name'], "email" => $row['customer_email'], "phone" => $row['customer_phone'], "address" => $row['customer_address'], "type" => $row['customer_type'], "creation" => $row['customer_creation'], "id" => $id);
 
 	$conn->close();
 	return $return;
