@@ -4,6 +4,9 @@
 	width: 10%;
 	height: 10%;
 }
+.content {
+	display: flex;
+}
 .content ul{
 	display: inline-block;
 }
@@ -37,4 +40,27 @@ input{
 }
 .admin h3 a{
 	color: purple;
+}
+.block {
+	margin: 20px;
+	padding: 4px;
+	background-color: #cccccc;
+	display: inline-block;
+	text-align: center;
+	width: 50%;
+	top: 0;
+}
+.block ul{
+	padding-left: 0;
+	display: inline-block;
+}
+.block ul li{
+	width: 20%;
+	width: max-content;
+	margin-left: 0;
+	padding-left: 0;
+}
+.block ul li h3{
+	margin: 0;
+	width: max-content;
 }

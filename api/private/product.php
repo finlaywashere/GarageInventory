@@ -2,6 +2,18 @@
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 
+/*
+
+Stock codes:
+
+0 - Stock
+1 - Nonstock
+2 - Custom (Mass Produced)
+3 - Custom (One Off)
+4 - Custom (External Vendor)
+
+*/
+
 /**
 	Gets all the information on file about a product from its product id
 */
@@ -19,7 +31,7 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes']);
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id);
 
 	$conn->close();
 	return $return;
@@ -53,7 +65,7 @@ function get_product_history($id){
 			$min = $price;
 			$mini = $row['invoice_id'];
 		}
-    }
+	}
 	$maxinv = get_invoice($maxi);
 	$mininv = get_invoice($mini);
 	$return = array('max' => array('price' => $max, 'date' => $maxinv['date'], 'invoice' => $maxi, 'customer' => get_customer($maxinv['customer'])), 'min' => array('price' => $min, 'date' => $mininv['date'], 'invoice' => $mini, 'customer' => get_customer($mininv['customer'])));
@@ -135,27 +147,22 @@ function create_product($name,$desc,$notes,$loc){
 	$conn->close();
 	return $id;
 }
-function adjust_stock($id, $adj){
-	$conn = db_connect("inventory");
-	if(!$conn){
-		return NULL;
-	}
-	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
-	$stmt->bind_param("i",$id);
-	$stmt->execute();
-	$curr = $stmt->get_result()->fetch_assoc()['stock_count'];
-	$new = $curr+$adj;
-	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
-	$stmt->bind_param("ii",$new,$id);
-	$stmt->execute();
-	return $new;
-}
 function set_inventory($id, $value){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
 	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
+	$stmt->bind_param("ii",$value,$id);
+	$stmt->execute();
+	return 1;
+}
+function set_damaged($id, $value){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("UPDATE products SET damaged_count=? WHERE product_id=?;");
 	$stmt->bind_param("ii",$value,$id);
 	$stmt->execute();
 	return 1;
