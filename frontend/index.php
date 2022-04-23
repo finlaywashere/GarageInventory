@@ -15,7 +15,7 @@
 	</head>
 		<body>
 			<?php require("../../frontend/header.php");?>
-			<div class="content">
+			<div class="content" style="display: flex;">
 				<div class="block">
 					<h3>Search</h3>
 					<ul>

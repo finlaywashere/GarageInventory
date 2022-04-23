@@ -63,10 +63,48 @@ function get_accounts(){
 	$ret = array();
 
 	while($row = $result->fetch_assoc()){
-		$ret[$row['account_id']] = array("name" => $row['account_name'], "perms" => $row['account_perms'], "desc" => $row['account_desc']);
+		$ret[$row['account_id']] = array("name" => $row['account_name'], "perms" => $row['account_perms'], "desc" => $row['account_desc'], "balance" => get_account_balance($row['account_id']));
 	}
 	$conn->close();
 	return $ret;
+}
+
+function create_account($name,$perms,$desc){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("INSERT INTO accounts (account_name,account_perms,account_desc) VALUES (?,?,?);");
+	$stmt->bind_param("sis",$name,$perms,$desc);
+	$stmt->execute();
+	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$row = $result->fetch_assoc();
+	$id = $row['LAST_INSERT_ID()'];
+	$conn->close();
+	return $id;
+}
+function get_account_balance($id){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT payment_amount,invoice_id FROM payments WHERE payment_type=4 AND payment_identifier=?;");
+	$stmt->bind_param("s",$id);
+	$stmt->execute();
+	$bal = 0;
+	$result = $stmt->get_result();
+
+	while($row = $result->fetch_assoc()){
+		$inv = get_invoice($row['invoice_id']);
+		if($inv['type'] == 1)
+			$bal += $row['payment_amount'];
+		else if($inv['type'] == 2)
+			$bal -= $row['payment_amount'];
+	}
+	$conn->close();
+	return $bal;
 }
 
 /**

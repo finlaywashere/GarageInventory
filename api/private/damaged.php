@@ -38,9 +38,9 @@ function damaged_resolve($id, $status){
 	$prod = get_product($dmg['product']);
 	if(!$prod)
 		return 3;
-	if(!set_damaged($prod['id'],$prod['damaged']-1)
+	if(!set_damaged($prod['id'],$prod['damaged']-1))
 		return 4;
-	if(!set_inventory($prod['id'],$prod['count']+1)
+	if(!set_inventory($prod['id'],$prod['count']+1))
 		return 5;
 	return 0;
 }
@@ -60,7 +60,7 @@ function damaged_retrieve(){
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("SELECT damaged_id FROM damaged WHERE damaged_status != 2;"
+	$stmt = $conn->prepare("SELECT damaged_id FROM damaged WHERE damaged_status != 2;");
 	$stmt->execute();
 
 	$result = $stmt->get_result();
@@ -78,7 +78,7 @@ function damaged_get($id){
     if(!$conn){
         return 0;
     }
-    $stmt = $conn->prepare("SELECT * FROM damaged WHERE damaged_status < 5;"
+    $stmt = $conn->prepare("SELECT * FROM damaged WHERE damaged_status < 5;");
     $stmt->execute();
 
     $result = $stmt->get_result();

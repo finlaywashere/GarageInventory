@@ -4,9 +4,6 @@
 	width: 10%;
 	height: 10%;
 }
-.content {
-	display: flex;
-}
 .content ul{
 	display: inline-block;
 }

@@ -11,6 +11,7 @@ Stock codes:
 2 - Custom (Mass Produced)
 3 - Custom (One Off)
 4 - Custom (External Vendor)
+5 - Pseudo Item
 
 */
 
@@ -48,7 +49,7 @@ function get_product_history($id){
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
-		return 0;
+		return array();
 	}
 	
 	$max = 0;
@@ -119,25 +120,40 @@ function get_products($type, $param, $offset, $limit){
 	$conn->close();
 	return $return;
 }
-function modify_product($id,$name,$desc,$notes,$location){
+function adjust_stock($id, $adj){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return NULL;
+	}
+	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+	$curr = $stmt->get_result()->fetch_assoc()['stock_count'];
+	$new = $curr+$adj;
+	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
+	$stmt->bind_param("ii",$new,$id);
+	$stmt->execute();
+	return $new;
+}
+function modify_product($id,$name,$desc,$notes,$location,$type){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_location=? WHERE product_id=?;");
-	$stmt->bind_param("ssssi",$name,$desc,$notes,$location,$id);
+	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_location=?,stock_code=? WHERE product_id=?;");
+	$stmt->bind_param("ssssii",$name,$desc,$notes,$location,$type,$id);
 	$stmt->execute();
 
 	$conn->close();
 }
-function create_product($name,$desc,$notes,$loc){
+function create_product($name,$desc,$notes,$loc,$type){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
 
-	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_location) VALUES (?,?,?,?)");
-	$stmt->bind_param("ssss",$name,$desc,$notes,$loc);
+	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_location, stock_code) VALUES (?,?,?,?,?)");
+	$stmt->bind_param("ssssi",$name,$desc,$notes,$loc,$type);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
 	$stmt->execute();

@@ -52,7 +52,14 @@ function invoice_create($subtotal, $total, $customer, $type, $notes, $entries, $
 		$stmt = $conn->prepare("INSERT INTO invoice_entries (invoice_id, product_id, original_id, entry_count, unit_count, entry_unit_price, entry_notes, entry_discount, due_count) VALUES (?,?,?,?,?,?,?,?,?);");
 		$stmt->bind_param("iisiiisii",$id,$product,$orig,$count,$unit_count,$unit_price,$notes,$discount,$due_count);
 		$stmt->execute();
-		adjust_stock($product,$count);
+		$prod = get_product($product);
+		if($prod != 5){
+			if($type <= 1){
+				adjust_stock($product,$count);
+			}else if($type == 2){
+				adjust_stock($product,-$count);
+			}
+		}
 	}
 	for($i = 0; $i < count($payments); $i++){
 		$type = $payments[$i]->{'type'};

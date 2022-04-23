@@ -81,6 +81,37 @@ function payment_type_to_string(type){
 		return "VIRTUAL";
 	}
 }
+function product_type_to_string(type){
+	if(type == 0){
+		return "STOCK";
+	}else if(type == 1){
+		return "NONSTOCK";
+	}else if(type == 2){
+		return "CUSTOM (MP)";
+	}else if(type == 3){
+		return "CUSTOM (OO)";
+	}else if(type == 4){
+		return "CUSTOM (EV)";
+	}else if(type == 5){
+		return "PSEUDO";
+	}
+}
+function product_string_to_type(string){
+	var lower = string.toUpperCase();
+	if(lower == "STOCK"){
+		return 0;
+	}else if(lower == "NONSTOCK"){
+		return 1;
+	}else if(lower == "CUSTOM (MP)"){
+		return 2;
+	}else if(lower == "CUSTOM (OO)"){
+		return 3;
+	}else if(lower == "CUSTOM (EV)"){
+		return 4;
+	}else if(lower == "PSEUDO"){
+		return 5;
+	}
+}
 
 function get_product(id){
 	return json_request("/inventory/api/public/product/get_product.php", "product_id="+id);
@@ -115,14 +146,14 @@ function get_journal(id){
 function update_customer(id,name,type,email,phone,address,notes){
 	return json_request("/inventory/api/public/customer/update_customer.php", "customer_id="+id+"&name="+encode(name)+"&type="+type+"&email="+encode(email)+"&phone="+encode(phone)+"&address="+encode(address)+"&notes="+encode(notes));
 }
-function update_product(id,name,desc,notes,loc){
-	return json_request("/inventory/api/public/product/update_product.php", "product_id="+id+"&name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&location="+encode(loc));
+function update_product(id,name,desc,notes,loc,type){
+	return json_request("/inventory/api/public/product/update_product.php", "product_id="+id+"&name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&location="+encode(loc)+"&type="+encode(type));
 }
 function get_products(type,param){
 	return json_request("/inventory/api/public/product/get_products.php", "search_type="+type+"&search_param="+encode(param));
 }
-function create_product(name,desc,notes,loc){
-	return json_request("/inventory/api/public/product/create_product.php", "name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&loc="+encode(loc));
+function create_product(name,desc,notes,loc,type){
+	return json_request("/inventory/api/public/product/create_product.php", "name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&loc="+encode(loc)+"&type="+encode(type));
 }
 function adjust_inventory(id,count,notes){
 	return json_request("/inventory/api/public/product/adjust_inventory.php", "product_id="+id+"&count="+count+"&notes="+encode(notes));

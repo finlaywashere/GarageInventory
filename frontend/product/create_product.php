@@ -19,6 +19,15 @@
 			<label>Description: </label><input id="desc" type="text"><br>
 			<label>Notes: </label><input id="notes" type="text"><br>
 			<label>Location: </label><input id="location" type="text"><br>
+			<label>Stock Code: </label>
+			<select id="type">
+				<option value="0">Stock</option>
+				<option value="1">Non Stock</option>
+				<option value="2">Custom (MP)</option>
+				<option value="3">Custom (OO)</option>
+				<option value="4">Custom (EV)</option>
+				<option value="5">Pseudo</option>
+			</select><br>
 			<button id="create">Create</button>
 			<button id="reset">Reset</button>
 			<p style="color: red;" id="error"></p>
@@ -39,6 +48,7 @@ var nameI = document.getElementById("name");
 var desc = document.getElementById("desc");
 var notes = document.getElementById("notes");
 var loc = document.getElementById("location");
+var type = document.getElementById("type");
 
 createButton.addEventListener("click",create);
 resetButton.addEventListener("click",reset);
@@ -50,13 +60,14 @@ function reset(){
 	desc.value = "";
 	notes.value = "";
 	loc.value = "";
+	type.selectedIndex = 0;
 }
 
 function create(){
 	if(nameI.value.length == 0) return;
 	error.innerHTML = "";
 	success.innerHTML = "";
-	var result = create_product(nameI.value,desc.value,notes.value,loc.value);
+	var result = create_product(nameI.value,desc.value,notes.value,loc.value,type.value);
 	if(!result.success){
 		console.log("Failed to retrieve data!");
 		error.value = "An error occurred while processing your request. Error: "+result.reason;

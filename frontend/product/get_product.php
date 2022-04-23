@@ -29,6 +29,7 @@
 					<th>Count</th>
 					<th>Notes</th>
 					<th>Location</th>
+					<th>Stock Code</th>
 				</tr>
 			</table><br>
 			<h2>History</h2>
@@ -59,6 +60,7 @@ var nameH = null;
 var desc = null;
 var notes = null;
 var loc = null;
+var code = null;
 var pid;
 
 searchButton.addEventListener("click",search);
@@ -76,7 +78,9 @@ function save(){
 	var descS = desc.innerHTML;
 	var notesS = notes.innerHTML;
 	var locS = loc.innerHTML;
-	var json = update_product(pid,nameS,descS,notesS,locS);
+	var codeS = code.innerHTML;
+	var codeI = product_string_to_type(codeS);
+	var json = update_product(pid,nameS,descS,notesS,locS,codeI);
 	if(!json.success){
 		console.log("Failed to save data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
@@ -106,24 +110,26 @@ function search(){
 	createElement(json.product['count'],entry);
 	notes = createEditableElement(json.product['notes'],entry);
 	loc = createEditableElement(json.product['location'],entry);
+	code = createEditableElement(product_type_to_string(json.product['code']),entry);
 	table.appendChild(entry);
-	var entryMin = document.createElement("tr");
-	createElement("Min",entryMin);
-	createElement("$"+hist.history.min['price']/100,entryMin);
-	createElement(hist.history.min['date'],entryMin);
-	createElement(hist.history.min['invoice'],entryMin);
-	var cid = hist.history.min.customer['id'];
-	createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.min.customer['name']+"</a>",entryMin);
-	t_history.appendChild(entryMin);
-	var entryMax = document.createElement("tr");
-	createElement("Max",entryMax);
-	createElement("$"+hist.history.max['price']/100,entryMax);
-	createElement(hist.history.max['date'],entryMax);
-	createElement(hist.history.max['invoice'],entryMax);
-	var cid = hist.history.max.customer['id'];
-	createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.max.customer['name']+"</a>",entryMax);
-	t_history.appendChild(entryMax);
-
+	if(hist.history.length > 0){
+		var entryMin = document.createElement("tr");
+		createElement("Min",entryMin);
+		createElement("$"+hist.history.min['price']/100,entryMin);
+		createElement(hist.history.min['date'],entryMin);
+		createElement(hist.history.min['invoice'],entryMin);
+		var cid = hist.history.min.customer['id'];
+		createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.min.customer['name']+"</a>",entryMin);
+		t_history.appendChild(entryMin);
+		var entryMax = document.createElement("tr");
+		createElement("Max",entryMax);
+		createElement("$"+hist.history.max['price']/100,entryMax);
+		createElement(hist.history.max['date'],entryMax);
+		createElement(hist.history.max['invoice'],entryMax);
+		var cid = hist.history.max.customer['id'];
+		createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.max.customer['name']+"</a>",entryMax);
+		t_history.appendChild(entryMax);
+	}
 	pid = param.value;
 }
 
