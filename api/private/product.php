@@ -12,6 +12,7 @@ Stock codes:
 3 - Custom (One Off)
 4 - Custom (External Vendor)
 5 - Pseudo Item
+6 - Damaged Item
 
 */
 
@@ -172,6 +173,10 @@ function set_inventory($id, $value){
 	$stmt->bind_param("ii",$value,$id);
 	$stmt->execute();
 	return 1;
+}
+function adjust_damaged($id,$count){
+	$product = get_product($id);
+	return set_damaged($id,$product['damaged']+$count);
 }
 function set_damaged($id, $value){
 	$conn = db_connect("inventory");

@@ -11,11 +11,14 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 * 5 = Administrative
 * 6 = Security
 * 7 = Override
+* 8 = Damaged
+* 9 = Projects
+* 10 = Accounts
 *
 * Journal types
 * 1 = Create
 * 2 = Modify
-* 3 = Delete
+* 3 = Delete/Close
 *
 * Note: For all transactions that don't touch an invoice, use the product_id or customer_id for the data
 */

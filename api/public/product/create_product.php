@@ -16,6 +16,10 @@ $notes = req_get('notes');
 $loc = req_get('loc');
 $type = req_get('type');
 
+if($type < 0 || $type > 5){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_product')));
+}
+
 $product = create_product($name,$desc,$notes,$loc,$type);
 
 journal_log(1,"Product ".$product." created",3,$product,get_username(),$_SERVER['REMOTE_ADDR']);
