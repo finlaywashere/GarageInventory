@@ -99,7 +99,7 @@ for($i = 0; $i < count($payments); $i++){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$amount = json_get($payments[$i],'amount');
-	if($amount < 0 || $amount == 0){
+	if($amount == 0){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$ident = json_get($payments[$i],'identifier');
