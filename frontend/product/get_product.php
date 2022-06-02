@@ -36,9 +36,8 @@
 			<table id="table_history" style="width: 80%;">
 				<tr id="table_header">
 					<th>Type</th>
-					<th>Price</th>
-					<th>Date</th>
 					<th>Invoice</th>
+					<th>Date</th>
 					<th>Customer</th>
 				</tr>
 			</table>
@@ -113,22 +112,16 @@ function search(){
 	code = createEditableElement(product_type_to_string(json.product['code']),entry);
 	table.appendChild(entry);
 	if(hist.history.length > 0){
-		var entryMin = document.createElement("tr");
-		createElement("Min",entryMin);
-		createElement("$"+hist.history.min['price']/100,entryMin);
-		createElement(hist.history.min['date'],entryMin);
-		createElement(hist.history.min['invoice'],entryMin);
-		var cid = hist.history.min.customer['id'];
-		createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.min.customer['name']+"</a>",entryMin);
-		t_history.appendChild(entryMin);
-		var entryMax = document.createElement("tr");
-		createElement("Max",entryMax);
-		createElement("$"+hist.history.max['price']/100,entryMax);
-		createElement(hist.history.max['date'],entryMax);
-		createElement(hist.history.max['invoice'],entryMax);
-		var cid = hist.history.max.customer['id'];
-		createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+hist.history.max.customer['name']+"</a>",entryMax);
-		t_history.appendChild(entryMax);
+		for(let i = 0; i < hist.history.length; i++){
+			var a = hist.history[i];
+			var entry = document.createElement("tr");
+			createElement(invoice_type_to_string(a['type']),entry);
+			createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+a['invoice_id']+"\">"+a['invoice_id']+"</a>",entry);
+			createElement(a['date'],entry);
+			var cid = a.customer['id'];
+			createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+cid+"</a>",entry);
+			t_history.appendChild(entry);
+		}
 	}
 	pid = param.value;
 }

@@ -44,7 +44,7 @@ function get_product_history($id){
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("SELECT `unit_count`,`entry_unit_price`,`entry_discount`,`invoice_id` FROM `invoice_entries` WHERE `product_id` = ?;");
+	$stmt = $conn->prepare("SELECT `invoice_id` FROM `invoice_entries` WHERE `product_id` = ? ORDER BY invoice_id DESC LIMIT 20;");
 	$stmt->bind_param("i",$id);
 	$stmt->execute();
 
@@ -52,26 +52,11 @@ function get_product_history($id){
 	if(!mysqli_num_rows($result)){
 		return array();
 	}
-	
-	$max = 0;
-	$maxi = 0;
-	$mini = 0;
-	$min = 9999999999;
+	$ret = array();
 	while($row = $result->fetch_assoc()){
-		$price = $row['entry_unit_price']-$row['entry_discount'];
-		$price = (int) $price/$row['unit_count'];
-		if($price > $max){
-			$max = $price;
-			$maxi = $row['invoice_id'];
-		}else if($price < $min){
-			$min = $price;
-			$mini = $row['invoice_id'];
-		}
+		array_push($ret,get_invoice($row['invoice_id']));
 	}
-	$maxinv = get_invoice($maxi);
-	$mininv = get_invoice($mini);
-	$return = array('max' => array('price' => $max, 'date' => $maxinv['date'], 'invoice' => $maxi, 'customer' => get_customer($maxinv['customer'])), 'min' => array('price' => $min, 'date' => $mininv['date'], 'invoice' => $mini, 'customer' => get_customer($mininv['customer'])));
-	return $return;
+	return $ret;
 }
 function is_product($id){
 	return get_product($id) > 0;
