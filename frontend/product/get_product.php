@@ -28,7 +28,6 @@
 					<th>Description</th>
 					<th>Count</th>
 					<th>Notes</th>
-					<th>Location</th>
 					<th>Stock Code</th>
 				</tr>
 			</table><br>
@@ -108,7 +107,6 @@ function search(){
 	desc = createEditableElement(json.product['description'],entry);
 	createElement(json.product['count'],entry);
 	notes = createEditableElement(json.product['notes'],entry);
-	loc = createEditableElement(json.product['location'],entry);
 	code = createEditableElement(product_type_to_string(json.product['code']),entry);
 	table.appendChild(entry);
 	if(hist.history.length > 0){

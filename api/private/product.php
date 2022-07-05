@@ -33,7 +33,7 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"location" => $row['stock_location'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id);
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id, "location" => get_product_locations($product_id));
 
 	$conn->close();
 	return $return;
@@ -81,9 +81,8 @@ function get_products($type, $param, $offset, $limit){
 		$stmt->bind_param("sii",$param,$offset,$limit);
 	}else if($type == 3){
 		// Search by location
-		$param = "%".$param."%";
-		$stmt = $conn->prepare("SELECT product_id FROM products WHERE stock_location LIKE ? AND product_id > ? LIMIT ?;");
-		$stmt->bind_param("sii",$param,$offset,$limit);
+		// TODO: Implement this
+		return NULL;
 	}else if($type == 4){
 		// Search by description
 		$param = "%".$param."%";
@@ -121,25 +120,25 @@ function adjust_stock($id, $adj){
 	$stmt->execute();
 	return $new;
 }
-function modify_product($id,$name,$desc,$notes,$location,$type){
+function modify_product($id,$name,$desc,$notes,$type){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_location=?,stock_code=? WHERE product_id=?;");
-	$stmt->bind_param("ssssii",$name,$desc,$notes,$location,$type,$id);
+	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_code=? WHERE product_id=?;");
+	$stmt->bind_param("sssii",$name,$desc,$notes,$type,$id);
 	$stmt->execute();
 
 	$conn->close();
 }
-function create_product($name,$desc,$notes,$loc,$type){
+function create_product($name,$desc,$notes,$type){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
 
-	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_location, stock_code) VALUES (?,?,?,?,?)");
-	$stmt->bind_param("ssssi",$name,$desc,$notes,$loc,$type);
+	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_code) VALUES (?,?,?,?,?)");
+	$stmt->bind_param("sssi",$name,$desc,$notes,$type);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
 	$stmt->execute();

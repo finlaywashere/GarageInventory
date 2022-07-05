@@ -14,6 +14,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/db.php";
 * 8 = Damaged
 * 9 = Projects
 * 10 = Accounts
+* 11 = Cash
 *
 * Journal types
 * 1 = Create

@@ -18,7 +18,6 @@
 			<label>Name: </label><input id="name" type="text"><br>
 			<label>Description: </label><input id="desc" type="text"><br>
 			<label>Notes: </label><input id="notes" type="text"><br>
-			<label>Location: </label><input id="location" type="text"><br>
 			<label>Stock Code: </label>
 			<select id="type">
 				<option value="0">Stock</option>
@@ -47,7 +46,6 @@ var success = document.getElementById("success");
 var nameI = document.getElementById("name");
 var desc = document.getElementById("desc");
 var notes = document.getElementById("notes");
-var loc = document.getElementById("location");
 var type = document.getElementById("type");
 
 createButton.addEventListener("click",create);
@@ -59,7 +57,6 @@ function reset(){
 	nameI.value = "";
 	desc.value = "";
 	notes.value = "";
-	loc.value = "";
 	type.selectedIndex = 0;
 }
 
@@ -67,7 +64,7 @@ function create(){
 	if(nameI.value.length == 0) return;
 	error.innerHTML = "";
 	success.innerHTML = "";
-	var result = create_product(nameI.value,desc.value,notes.value,loc.value,type.value);
+	var result = create_product(nameI.value,desc.value,notes.value,type.value);
 	if(!result.success){
 		console.log("Failed to retrieve data!");
 		error.value = "An error occurred while processing your request. Error: "+result.reason;
