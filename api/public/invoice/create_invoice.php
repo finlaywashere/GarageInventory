@@ -33,12 +33,6 @@ if(!json_cont($data,'due_date')){
 	$due_date = sanitize($data->{'due_date'});
 }
 
-if($subtotal <= 0){
-	die(json_encode(array('success' => false, 'reason' => 'invalid_subtotal')));
-}
-if($total <= 0 || $total < $subtotal){
-    die(json_encode(array('success' => false, 'reason' => 'invalid_total')));
-}
 if($customer < 0 || !is_customer($customer)){
     die(json_encode(array('success' => false, 'reason' => 'invalid_customer')));
 }
@@ -73,9 +67,6 @@ for($i = 0; $i < count($entries); $i++){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$price = json_get($entries[$i],'unit_price');
-	if($price < 0 || $price == 0){
-		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
-	}
 	$discount = json_get($entries[$i],'unit_discount');
 	$enotes = json_get($entries[$i],'notes');
 	$edue = json_get($entries[$i],'due');
@@ -133,6 +124,16 @@ for($i = 0; $i < count($payments); $i++){
 			if($len < 4){
 				die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 			}
+		}
+	}
+	if($ptype == 0){
+		// Check to make sure it is a valid location
+		if(get_cash($ident) == NULL){
+			die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
+		}
+		$cash = get_cash($ident)['total'];
+		if($cash-$amount < 0){
+			die(json_encode(array('success' => false, 'reason' => 'invalid_funds')));
 		}
 	}
 }

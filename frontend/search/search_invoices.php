@@ -23,6 +23,8 @@
 				<option value="3">Customer ID</option>
 			</select>
 			<button id="search">Search</button>
+			<button id="prev">Prev Page</button>
+			<button id="next">Next Page</button>
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
@@ -52,9 +54,35 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
+var next = document.getElementById("next");
+var prev = document.getElementById("prev");
+
+var offset = 0;
+var offsets = [0];
+
+next.addEventListener("click",nextpage);
+prev.addEventListener("click",prevpage);
+
+function nextpage(){
+	var index = offsets.length-1;
+	if(offsets[index] === undefined)
+		return;
+	offset = offsets[index];
+	search();
+}
+function prevpage(){
+	var index = offsets.length-3;
+	if(index < 0)
+		return;
+	offset = offsets[index];
+	offsets.pop();
+	offsets.pop();
+	search();
+}
+
 function search(){
 	error.innerHTML = "";
-	var invoicesJ = get_invoices(type.value,param.value);
+	var invoicesJ = get_invoices(type.value,param.value,offset);
 	if(!invoicesJ.success){
 		console.log("Failed to retrieve data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+invoicesJ.reason;
@@ -62,6 +90,7 @@ function search(){
 	}
 	clearTable(table);
 	var invoices = invoicesJ.invoices;
+	offsets.push(invoices[invoices.length-1]);
 	for(let i = 0; i < invoices.length; i++){
 		var invoice = get_invoice(invoices[i]);
 		if(!invoice.success){

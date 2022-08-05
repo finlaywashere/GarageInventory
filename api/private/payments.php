@@ -134,6 +134,15 @@ function payment_create($user, $invoice, $amount, $type, $identifier, $notes="")
 			return 4;
 		}
 	}
+	if($type == 0){
+		// Paying with cash
+		if(get_cash($identifier) == NULL){
+			return 3; // Not coming from a valid location
+		}
+		if(!adjust_cash($identifier, $amount * -1)){
+			return 4; // Insufficient balance in location
+		}
+	}
 	//TODO: Implement virtual accounts (moving money between invoices)
 	$conn = db_connect("inventory");
 	if(!$conn){

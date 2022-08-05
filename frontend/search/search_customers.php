@@ -24,6 +24,8 @@
 				<option value="4">ID</option>
 			</select>
 			<button id="search">Search</button>
+			<button id="prev">Prev Page</button>
+			<button id="next">Next Page</button>
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
@@ -51,14 +53,41 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
+var next = document.getElementById("next");
+var prev = document.getElementById("prev");
+
+var offset = 0;
+var offsets = [0];
+
+next.addEventListener("click",nextpage);
+prev.addEventListener("click",prevpage);
+
+function nextpage(){
+	var index = offsets.length-1;
+	if(offsets[index] === undefined)
+		return;
+	offset = offsets[index];
+	search();
+}
+function prevpage(){
+	var index = offsets.length-3;
+	if(index < 0)
+		return;
+	offset = offsets[index];
+	offsets.pop();
+	offsets.pop();
+	search();
+}
+
 function search(){
-	var customers = get_customers(type.value,param.value);
+	var customers = get_customers(type.value,param.value,offset);
 	if(!customers.success){
 		console.log("Failed to retrieve data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+customers.reason;
 		return;
 	}
 	clearTable(table);
+	offsets.push(customers.customers[customers.customers.length-1]);
 	for(let i = 0; i < customers.customers.length; i++){
 		var customer = get_customer(customers.customers[i]);
 		if(!customer.success){

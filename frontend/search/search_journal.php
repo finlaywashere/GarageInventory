@@ -26,6 +26,8 @@
 				<option value="6">IP</option>
 			</select>
 			<button id="search">Search</button>
+			<button id="prev">Prev Page</button>
+			<button id="next">Next Page</button>
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
@@ -55,8 +57,35 @@ var error = document.getElementById("error");
 var table = document.getElementById("results");
 searchButton.addEventListener("click",search);
 
+var next = document.getElementById("next");
+var prev = document.getElementById("prev");
+
+var offset = 0;
+var offsets = [0];
+
+next.addEventListener("click",nextpage);
+prev.addEventListener("click",prevpage);
+
+function nextpage(){
+	var index = offsets.length-1;
+	if(offsets[index] === undefined)
+		return;
+	offset = offsets[index];
+	search();
+}
+function prevpage(){
+	var index = offsets.length-3;
+	if(index < 0)
+		return;
+	offset = offsets[index];
+	offsets.pop();
+	offsets.pop();
+	search();
+}
+
+
 function search(){
-	var journal = search_journal(search_type.value,param.value);
+	var journal = search_journal(search_type.value,param.value,offset);
 	if(!journal.success){
 		console.log("Failed to retrieve data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+journal.reason;
@@ -64,6 +93,7 @@ function search(){
 	}
 	clearTable(table);
 	var journals = journal.journals;
+	offsets.push(journals[journals.length-1]);
 	for(let i = 0; i < journals.length; i++){
 		var journal = get_journal(journals[i]);
 		if(!journal.success){

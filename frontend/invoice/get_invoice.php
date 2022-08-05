@@ -102,8 +102,8 @@ function search(){
 	createElement(invoice_type_to_string(iType),entry);
 	createElement(invoice.invoice['invoice_id'],entry);
 	var subtotal = invoice.invoice['subtotal']/100;
-	createElement("$"+subtotal,entry);
-	createElement("$"+(invoice.invoice['total']/100),entry);
+	createElement("$"+subtotal.toFixed(2),entry);
+	createElement("$"+(invoice.invoice['total']/100).toFixed(2),entry);
 	createElement(customer.customer['name'],entry);
 	createElement(invoice.invoice['original_id'],entry);
 	createElement(invoice.invoice['notes'],entry);
@@ -126,9 +126,9 @@ function search(){
 		createElement(entry['count'],tEntry);
 		createElement(entry['unit_count'],tEntry);
 		var price = entry['unit_price'] / 100;
-		createElement("$"+price,tEntry);
+		createElement("$"+price.toFixed(2),tEntry);
 		var discount = entry['unit_discount'] / 100;
-		createElement("$"+discount,tEntry);
+		createElement("$"+discount.toFixed(2),tEntry);
 		createElement(entry['notes'],tEntry);
 		var lTotal = (entry['count']/entry['unit_count']*(price-discount));
 		createElement("$"+lTotal.toFixed(2), tEntry)

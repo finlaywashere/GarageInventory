@@ -15,7 +15,7 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<label>Invoice Search: </label><input id="search_param" type="text">
+			<label>Product Search: </label><input id="search_param" type="text">
 			<label>Type: </label>
 			<select id="search_type">
 				<option value="1">ID</option>
@@ -24,6 +24,8 @@
 				<option value="4">Description</option>
 			</select>
 			<button id="search">Search</button>
+			<button id="prev">Prev Page</button>
+			<button id="next">Next Page</button>
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
@@ -49,10 +51,42 @@ var param = document.getElementById("search_param");
 var type = document.getElementById("search_type");
 var error = document.getElementById("error");
 var table = document.getElementById("results");
-searchButton.addEventListener("click",search);
+
+var next = document.getElementById("next");
+var prev = document.getElementById("prev");
+
+var offset = 0;
+var offsets = [0];
+
+next.addEventListener("click",nextpage);
+prev.addEventListener("click",prevpage);
+
+function nextpage(){
+	var index = offsets.length-1;
+	if(offsets[index] === undefined)
+		return;
+	offset = offsets[index];
+	search();
+}
+function prevpage(){
+	var index = offsets.length-3;
+	if(index < 0)
+		return;
+	offset = offsets[index];
+	offsets.pop();
+	offsets.pop();
+	search();
+}
+
+searchButton.addEventListener("click",searchB);
+
+function searchB(){
+	offset = 0;
+	search();
+}
 
 function search(){
-	var products = get_products(type.value,param.value);
+	var products = get_products(type.value,param.value,offset);
 	if(!products.success){
 		console.log("Failed to retrieve data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+products.reason;
@@ -60,6 +94,8 @@ function search(){
 	}
 	clearTable(table);
 	var p = products.products;
+	var lastElem = p[p.length-1];
+	offsets.push(lastElem);
 	for(let i = 0; i < p.length; i++){
 		var product = get_product(p[i]);
 		if(!product.success){

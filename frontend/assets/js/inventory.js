@@ -122,14 +122,14 @@ function get_product_history(id){
 function get_invoice(id){
 	return json_request("/inventory/api/public/invoice/get_invoice.php", "invoice_id="+id);
 }
-function get_invoices(type,param){
-	return json_request("/inventory/api/public/invoice/get_invoices.php", "search_type="+type+"&search_param="+encode(param));
+function get_invoices(type,param,offset){
+	return json_request("/inventory/api/public/invoice/get_invoices.php", "search_type="+type+"&search_param="+encode(param)+"&search_offset="+offset);
 }
 function get_customer(id){
 	return json_request("/inventory/api/public/customer/get_customer.php","customer_id="+id);
 }
-function get_customers(type,param){
-	return json_request("/inventory/api/public/customer/get_customers.php", "search_type="+type+"&search_param="+encode(param));
+function get_customers(type,param,offset){
+	return json_request("/inventory/api/public/customer/get_customers.php", "search_type="+type+"&search_param="+encode(param)+"&search_offset="+offset);
 }
 function create_customer(name,email,phone,address,notes,type){
 	return json_request("/inventory/api/public/customer/create_customer.php", "name="+encode(name)+"&email="+encode(email)+"&phone="+encode(phone)+"&address="+encode(address)+"&notes="+encode(notes)+"&type="+type);
@@ -137,8 +137,8 @@ function create_customer(name,email,phone,address,notes,type){
 function create_invoice(data){
 	return json_request("/inventory/api/public/invoice/create_invoice.php","data="+encode(data));
 }
-function search_journal(type,param){
-	return json_request("/inventory/api/public/journal/search_journal.php", "search_type="+type+"&search_param="+encode(param));
+function search_journal(type,param,offset){
+	return json_request("/inventory/api/public/journal/search_journal.php", "search_type="+type+"&search_param="+encode(param)+"&search_offset="+offset);
 }
 function get_journal(id){
 	return json_request("/inventory/api/public/journal/journal_data.php", "journal_uid="+id);
@@ -146,14 +146,14 @@ function get_journal(id){
 function update_customer(id,name,type,email,phone,address,notes){
 	return json_request("/inventory/api/public/customer/update_customer.php", "customer_id="+id+"&name="+encode(name)+"&type="+type+"&email="+encode(email)+"&phone="+encode(phone)+"&address="+encode(address)+"&notes="+encode(notes));
 }
-function update_product(id,name,desc,notes,type){
-	return json_request("/inventory/api/public/product/update_product.php", "product_id="+id+"&name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&type="+encode(type));
+function update_product(id,name,desc,notes,type,loc){
+	return json_request("/inventory/api/public/product/update_product.php", "product_id="+id+"&name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&type="+type+"&loc="+encode(loc));
 }
-function get_products(type,param){
-	return json_request("/inventory/api/public/product/get_products.php", "search_type="+type+"&search_param="+encode(param));
+function get_products(type,param,offset){
+	return json_request("/inventory/api/public/product/get_products.php", "search_type="+type+"&search_param="+encode(param)+"&search_offset="+offset);
 }
-function create_product(name,desc,notes,type){
-	return json_request("/inventory/api/public/product/create_product.php", "name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&type="+encode(type));
+function create_product(name,desc,notes,type,loc){
+	return json_request("/inventory/api/public/product/create_product.php", "name="+encode(name)+"&desc="+encode(desc)+"&notes="+encode(notes)+"&type="+encode(type)+"&loc="+encode(loc));
 }
 function adjust_inventory(id,count,notes){
 	return json_request("/inventory/api/public/product/adjust_inventory.php", "product_id="+id+"&count="+count+"&notes="+encode(notes));

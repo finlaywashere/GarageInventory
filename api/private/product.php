@@ -33,7 +33,7 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id, "location" => get_product_locations($product_id));
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id, "location" => $row['stock_location']);
 
 	$conn->close();
 	return $return;
@@ -120,25 +120,25 @@ function adjust_stock($id, $adj){
 	$stmt->execute();
 	return $new;
 }
-function modify_product($id,$name,$desc,$notes,$type){
+function modify_product($id,$name,$desc,$notes,$type,$loc){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_code=? WHERE product_id=?;");
-	$stmt->bind_param("sssii",$name,$desc,$notes,$type,$id);
+	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_code=?,stock_location=? WHERE product_id=?;");
+	$stmt->bind_param("sssisi",$name,$desc,$notes,$type,$loc,$id);
 	$stmt->execute();
 
 	$conn->close();
 }
-function create_product($name,$desc,$notes,$type){
+function create_product($name,$desc,$notes,$type,$loc){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
 
-	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_code) VALUES (?,?,?,?,?)");
-	$stmt->bind_param("sssi",$name,$desc,$notes,$type);
+	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_code, stock_location) VALUES (?,?,?,?,?,?)");
+	$stmt->bind_param("sssis",$name,$desc,$notes,$type,$loc);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
 	$stmt->execute();

@@ -27,6 +27,7 @@
 				<option value="4">Custom (EV)</option>
 				<option value="5">Pseudo</option>
 			</select><br>
+			<label>Location: </label><input id="loc" type="text"><br>
 			<button id="create">Create</button>
 			<button id="reset">Reset</button>
 			<p style="color: red;" id="error"></p>
@@ -47,6 +48,7 @@ var nameI = document.getElementById("name");
 var desc = document.getElementById("desc");
 var notes = document.getElementById("notes");
 var type = document.getElementById("type");
+var loc = document.getElementById("loc");
 
 createButton.addEventListener("click",create);
 resetButton.addEventListener("click",reset);
@@ -57,6 +59,7 @@ function reset(){
 	nameI.value = "";
 	desc.value = "";
 	notes.value = "";
+	loc.value = "";
 	type.selectedIndex = 0;
 }
 
@@ -64,7 +67,7 @@ function create(){
 	if(nameI.value.length == 0) return;
 	error.innerHTML = "";
 	success.innerHTML = "";
-	var result = create_product(nameI.value,desc.value,notes.value,type.value);
+	var result = create_product(nameI.value,desc.value,notes.value,type.value,loc.value);
 	if(!result.success){
 		console.log("Failed to retrieve data!");
 		error.value = "An error occurred while processing your request. Error: "+result.reason;

@@ -16,30 +16,45 @@ function get_cash($id){
 		return NULL;
 	}
 	$row = $result->fetch_assoc();
-	$nickels = $row['cash_nickels'];
-	$dimes = $row['cash_dimes'];
-	$quarters = $row['cash_quarters'];
-	$loonies = $row['cash_loonies'];
-	$toonies = $row['cash_toonies'];
-	$fives = $row['cash_fives'];
-	$tens = $row['cash_tens'];
-	$twenties = $row['cash_twenties'];
-	$fifties = $row['cash_fifties'];
-	$hundreds = $row['cash_hundreds'];
-	
-	$total = $nickels * 5 + $dimes * 10 + $quarters * 25 + $loonies * 100 + $toonies * 200 + $fives * 500 + $tens * 1000 + $twenties * 2000 + $fifties * 5000 + $hundreds * 10000;
 
-	$return = array("name" => $row['cash_name'], "total" => $total, "counts" => array("nickels" => $nickels, "dimes" => $dimes, "quarters" => $quarters, "loonies" => $loonies, "toonies" => $toonies, "fives" => $fives, "tens" => $tens, "twenties" => $twenties, "fifties" => $fifties, "hundreds" => $hundreds));
+	$return = array("name" => $row['cash_name'], "total" => $row['cash_amount']);
 	$conn->close();
 	return $return;
 }
-function set_cash($id, $nickels, $dimes, $quarters, $loonies, $toonies, $fives, $tens, $twenties, $fifties, $hundreds){
+function get_cash_locations(){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
-	$stmt = $conn->prepare("UPDATE cash SET cash_nickels=?,cash_dimes=?,cash_quarters=?,cash_loonies=?,cash_toonies=?,cash_fives=?,cash_tens=?,cash_twenties=?,cash_fifties=?,cash_hundreds=? WHERE cash_id=?;");
-	$stmt->bind_param("iiiiiiiiiii",$nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds,$id);
+	$stmt = $conn->prepare("SELECT cash_id FROM `cash` WHERE 1;");
+	$stmt->execute();
+	$result = $stmt->get_result();
+	if(!mysqli_num_rows($result)){
+		return array();
+	}
+	$ret = array();
+	while($row = $result->fetch_assoc()){
+		$ret[$row['cash_id']] = get_cash($row['cash_id']);
+	}
+	$conn->close();
+	return $ret;
+}
+function adjust_cash($id, $amount){
+	$cash = get_cash($id);
+	$result = $cash['total'] + $amount;
+	if($result < 0){
+		return 0;
+	}
+	set_cash($id,$result);
+	return 1;
+}
+function set_cash($id, $total){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return NULL;
+	}
+	$stmt = $conn->prepare("UPDATE cash SET cash_amount=? WHERE cash_id=?;");
+	$stmt->bind_param("ii",$total,$id);
 	$stmt->execute();
 	$conn->close();
 }

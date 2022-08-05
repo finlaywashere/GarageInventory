@@ -29,6 +29,7 @@
 					<th>Count</th>
 					<th>Notes</th>
 					<th>Stock Code</th>
+					<th>Location</th>
 				</tr>
 			</table><br>
 			<h2>History</h2>
@@ -78,7 +79,7 @@ function save(){
 	var locS = loc.innerHTML;
 	var codeS = code.innerHTML;
 	var codeI = product_string_to_type(codeS);
-	var json = update_product(pid,nameS,descS,notesS,locS,codeI);
+	var json = update_product(pid,nameS,descS,notesS,codeI,locS);
 	if(!json.success){
 		console.log("Failed to save data!");
 		error.innerHTML = "An error occurred while processing your request. Error: "+json.reason;
@@ -108,6 +109,7 @@ function search(){
 	createElement(json.product['count'],entry);
 	notes = createEditableElement(json.product['notes'],entry);
 	code = createEditableElement(product_type_to_string(json.product['code']),entry);
+	loc = createEditableElement(json.product['location'],entry);
 	table.appendChild(entry);
 	if(hist.history.length > 0){
 		for(let i = 0; i < hist.history.length; i++){
