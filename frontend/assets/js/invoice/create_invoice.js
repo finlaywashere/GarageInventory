@@ -11,24 +11,15 @@ var orig_id = document.getElementById("orig_id");
 var date = document.getElementById("date");
 var add = document.getElementById("add");
 var prodSearch = document.getElementById("prodSearch");
+var prodCreate = document.getElementById("prodCreateB");
 var entries = document.getElementById("entries");
 
 add.addEventListener("click",addRow);
 createButton.addEventListener("click",showConfirm);
 exchangeButton.addEventListener("click",exchange);
 resetButton.addEventListener("click",reset);
-prodSearch.addEventListener("click",productLookup);
 
-var prodLookupDiv = document.getElementById("prodLookupDiv");
-var prLType = document.getElementById("prLType");
-var prLParam = document.getElementById("prLParam");
-var prLSearch = document.getElementById("prLSearch");
-var prLClose = document.getElementById("prLClose");
-var prLError = document.getElementById("prLError");
-var prLResults = document.getElementById("prLResults");
-
-prLSearch.addEventListener("click",productSearch);
-prLClose.addEventListener("click",productLookupClose);
+prodLookupSetup(prodSearch,prodCreate);
 
 var infoText = document.getElementById("info");
 var taxExempt = document.getElementById("taxexempt");
@@ -46,7 +37,15 @@ var cancelButton = document.getElementById("cancel");
 continueButton.addEventListener("click",create);
 cancelButton.addEventListener("click",closeConfirm);
 
+var cusLookup = document.getElementById("cusLookup");
+
 updateTotal();
+
+csLookupSetup(custCallback,cusLookup);
+
+function custCallback(id){
+	customer.value = id;
+}
 
 function showConfirm(){
 	error.innerHTML = "";
@@ -353,11 +352,6 @@ function calcSubtotal(root){
 }
 function getPaymentTotal(){
 	return calcPaymentTotal(payments);
-}
-function getExchangePTotal(){
-	if(!exch)
-		return 0;
-	return calcPaymentTotal(ePayments);
 }
 function calcPaymentTotal(root){
 	var pTotal = 0;

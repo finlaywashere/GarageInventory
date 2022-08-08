@@ -137,7 +137,7 @@ function create_product($name,$desc,$notes,$type,$loc){
 		return NULL;
 	}
 
-	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_code, stock_location) VALUES (?,?,?,?,?,?)");
+	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_code, stock_location) VALUES (?,?,?,?,?)");
 	$stmt->bind_param("sssis",$name,$desc,$notes,$type,$loc);
 	$stmt->execute();
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");

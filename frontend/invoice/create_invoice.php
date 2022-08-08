@@ -40,6 +40,7 @@
 		<div class="content">
 			<button id="add">Add Entry</button>
 			<button id="prodSearch">Product Search</button>
+			<button id="prodCreateB">Create Product</button>
 			<br>
 			<table id="entries">
 				<tr id="table_header">
@@ -91,36 +92,10 @@
 				</tr>
 			</table>
 		</div>
-		<div id="cusLookupDiv" class="floating">
-			<h2>Customer ID Lookup</h2>
-			<label>Search Type: </label>
-			<select id="csLType">
-				<option value="1">Name</option>
-				<option value="2">Phone #</option>
-				<option value="3">Email</option>
-				<option value="4">Customer ID</option>
-			</select><br>
-			<label>Search Parameter: </label><input type="text" id="csLParam"><br>
-			<button id="csLSearch">Search</button>
-			<button id="csLClose">Close</button>
-			<p style="color: red;" id="csLError"></p>
-			<div id="csLResults"></div>
-		</div>
-		<div id="prodLookupDiv" class="floating">
-			<h2>Product ID Lookup</h2>
-			<label>Search Type: </label>
-			<select id="prLType">
-				<option value="2">Name</option>
-				<option value="4">Description</option>
-				<option value="3">Location</option>
-				<option value="1">ID</option>
-			</select><br>
-			<label>Search Parameter: </label><input type="text" id="prLParam"><br>
-			<button id="prLSearch">Search</button>
-			<button id="prLClose">Close</button>
-			<p style="color: red;" id="prLError"></p>
-			<div id="prLResults"></div>
-		</div>
+		<?php
+			require "../utils/customer_lookup.php";
+			require "../utils/product_lookup.php";
+		?>
 		<div id="confirm" class="floating">
 			<h2>Are you sure you would like to continue?</h2>
 			<p id="confirminfo"></p>
@@ -154,6 +129,5 @@
 </html>
 <script src="/assets/js/master.js"></script>
 <script src="/inventory/frontend/assets/js/inventory.js"></script>
-<script src="/inventory/frontend/assets/js/invoice/customer.js"></script>
 <script src="/inventory/frontend/assets/js/invoice/exchange.js"></script>
 <script src="/inventory/frontend/assets/js/invoice/create_invoice.js"></script>

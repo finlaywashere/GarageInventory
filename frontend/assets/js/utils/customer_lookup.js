@@ -1,6 +1,4 @@
-var cusLookup = document.getElementById("cusLookup");
 var cusLookupDiv = document.getElementById("cusLookupDiv");
-cusLookup.addEventListener("click",customerLookup);
 
 var csLType = document.getElementById("csLType");
 var csLParam = document.getElementById("csLParam");
@@ -11,6 +9,13 @@ var csLResults = document.getElementById("csLResults");
 
 csLSearch.addEventListener("click",customerSearch);
 csLClose.addEventListener("click",customerLookupClose);
+
+var csCallback;
+
+function csLookupSetup(callback, button){
+	csCallback = callback;
+	button.addEventListener("click",customerLookup);
+}
 
 function customerSearch(){
 	var customers = get_customers(csLType.value,csLParam.value);
@@ -52,7 +57,7 @@ function customerSearch(){
 function customerLookupSelect(trigger){
 	var button = trigger.target;
 	var id = button.id;
-	customer.value = id;
+	csCallback(id);
 	cusLookupDiv.style.visibility = "hidden";
 }
 function customerLookupClose(){

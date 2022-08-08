@@ -14,7 +14,7 @@ $name = req_get('name');
 $desc = req_get('desc');
 $notes = req_get('notes');
 $type = req_get('type');
-$log = req_get('loc');
+$loc = req_get('loc');
 
 if($type < 0 || $type > 5){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_product')));

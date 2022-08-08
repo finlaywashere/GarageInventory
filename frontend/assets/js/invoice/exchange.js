@@ -48,6 +48,13 @@ function exchangeRetrieve(){
 	}
 }
 
+function getExchangePTotal(){
+	if(!exch)
+		return 0;
+	return calcPaymentTotal(ePayments);
+}
+
+
 function exchangeCancel(){
 	exch = false;
 	ePopup.style.visibility = "hidden";
