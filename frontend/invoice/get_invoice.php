@@ -84,6 +84,7 @@ function search(){
 	error.innerHTML = "";
 	clearTable(table);
 	clearTable(iTable);
+	clearTable(pTable);
 	var invoice = get_invoice(param.value);
 	if(!invoice.success){
 		console.log("Failed to retrieve data!");

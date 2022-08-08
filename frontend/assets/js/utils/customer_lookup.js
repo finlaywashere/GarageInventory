@@ -1,4 +1,5 @@
 var cusLookupDiv = document.getElementById("cusLookupDiv");
+var cusCreateDiv = document.getElementById("cusCreateDiv");
 
 var csLType = document.getElementById("csLType");
 var csLParam = document.getElementById("csLParam");
@@ -12,9 +13,21 @@ csLClose.addEventListener("click",customerLookupClose);
 
 var csCallback;
 
-function csLookupSetup(callback, button){
+function csLookupSetup(callback, button, cButton){
 	csCallback = callback;
 	button.addEventListener("click",customerLookup);
+	cButton.addEventListener("click",showCusCreate);
+	cusCreateSetup(cusCreateCallback, hideCusCreate);
+}
+function showCusCreate(){
+	cusCreateDiv.style.visibility = "visible";
+}
+function hideCusCreate(){
+	cusCreateDiv.style.visibility = "hidden";
+}
+function cusCreateCallback(id){
+	hideCusCreate();
+	csCallback(id);
 }
 
 function customerSearch(){

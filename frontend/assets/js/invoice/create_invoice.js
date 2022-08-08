@@ -38,10 +38,11 @@ continueButton.addEventListener("click",create);
 cancelButton.addEventListener("click",closeConfirm);
 
 var cusLookup = document.getElementById("cusLookup");
+var cusCreateB = document.getElementById("cusCreateB");
 
 updateTotal();
 
-csLookupSetup(custCallback,cusLookup);
+csLookupSetup(custCallback,cusLookup,cusCreateB);
 
 function custCallback(id){
 	customer.value = id;

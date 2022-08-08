@@ -13,4 +13,8 @@
 	<p style="color: red;" id="csLError"></p>
 	<div id="csLResults"></div>
 </div>
+<div id="cusCreateDiv" class="floating" style="padding-top: 10px;">
+	<h2>Create Customer</h2>
+	<?php require $_SERVER['DOCUMENT_ROOT']."/inventory/frontend/utils/customer_create.php";?>
+</div>
 <script src="/inventory/frontend/assets/js/utils/customer_lookup.js"></script>

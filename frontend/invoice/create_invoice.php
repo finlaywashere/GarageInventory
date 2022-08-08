@@ -17,6 +17,7 @@
 		<div class="subheader" style="display: inline-block;">
 			<label>Customer: </label><input id="customer" type="number" min="0">
 			<button id="cusLookup">Customer Lookup</button>
+			<button id="cusCreateB">Create Customer</button>
 			<br>
 			<label>Type: </label>
 			<select id="type">
