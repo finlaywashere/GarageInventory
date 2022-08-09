@@ -161,3 +161,6 @@ function adjust_inventory(id,count,notes){
 function get_accounts(){
 	return json_request("/inventory/api/public/payments/get_accounts.php","");
 }
+function create_account(name,perms,desc){
+	return json_request("/inventory/api/public/payments/create_account.php","name="+encode(name)+"&perms="+perms+"&desc="+encode(desc));
+}

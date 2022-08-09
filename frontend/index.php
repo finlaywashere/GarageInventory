@@ -48,6 +48,7 @@
 						<div class="block">
 							<h3>Administrative</h3>
 							<ul>
+								<li><h3><a href="payment/create_account.php">Create Account</a></h3></li>
 							</ul>
 						</div>
 				<?php
