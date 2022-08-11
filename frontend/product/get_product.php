@@ -119,7 +119,7 @@ function search(){
 			createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+a['invoice_id']+"\">"+a['invoice_id']+"</a>",entry);
 			createElement(a['date'],entry);
 			var cid = a['customer'];
-			createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+cid+"</a>",entry);
+			createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+a.customer_full['name']+"</a>",entry);
 			t_history.appendChild(entry);
 		}
 	}

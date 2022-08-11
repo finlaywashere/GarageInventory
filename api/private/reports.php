@@ -101,7 +101,7 @@ function customer_report($user){
 		if(isset($system[$id]))
 			$sys = $system[$id];
 		// Calculate total amount of money COMING IN to the system
-		$tot = $out + $sys - $inc;
+		$tot = $inc - $out + $sys;
 		$inc = ($inc / 100);
 		$out = ($out / 100);
 		$sys = ($sys / 100);
