@@ -170,7 +170,7 @@ function get_invoice($invoice_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id'], "related" => $row['invoice_related'], "due_date" => $row['invoice_due'], "flags" => $row['invoice_flags'], "status" => $row['invoice_status'], "creation" => $row['invoice_creation'], "entries" => get_invoice_entries($invoice_id), "payments" => get_payments($invoice_id));
+	$return = array("notes" => $row['invoice_notes'], "original_id" => $row['original_id'], "type" => $row['invoice_type'], "date" => $row['invoice_date'], "total" => $row['invoice_total'], "subtotal" => $row['invoice_subtotal'], "customer" => $row['customer_id'], "invoice_id" => $row['invoice_id'], "related" => $row['invoice_related'], "due_date" => $row['invoice_due'], "flags" => $row['invoice_flags'], "status" => $row['invoice_status'], "creation" => $row['invoice_creation'], "entries" => get_invoice_entries($invoice_id), "payments" => get_payments($invoice_id), "customer_full" => get_customer($row['customer_id']));
 
 	$conn->close();
 	return $return;

@@ -68,6 +68,44 @@ function get_accounts(){
 	$conn->close();
 	return $ret;
 }
+function get_account($id){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT * FROM accounts WHERE account_id=?;");
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+
+	$result = $stmt->get_result();
+	
+	if(!mysqli_num_rows($result)){
+        return 0;
+    }
+
+	$row = $result->fetch_assoc();
+	$ret = array("name" => $row['account_name'], "perms" => $row['account_perms'], "desc" => $row['account_desc'], "balance" => get_account_balance($row['account_id']));
+	
+	$conn->close();
+	return $ret;
+}
+function account_history($id, $start, $end){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT invoice_id,user_id,payment_amount,payment_date FROM payments WHERE payment_type=4 AND payment_identifier=? AND payment_date BETWEEN ? AND ? ORDER BY payment_date;");
+	$stmt->bind_param("iss",$id,$start,$end);
+	$stmt->execute();
+
+	$result = $stmt->get_result();
+	$ret = array();
+
+	while($row = $result->fetch_assoc()){
+		array_push($ret,array("invoice" => get_invoice($row['invoice_id']), "user" => $row['user_id'], "amount" => $row['payment_amount'], "date" => $row['payment_date']));
+	}
+	return $ret;
+}
 
 function create_account($name,$perms,$desc){
 	$conn = db_connect("inventory");

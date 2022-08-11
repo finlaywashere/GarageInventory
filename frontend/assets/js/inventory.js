@@ -164,3 +164,9 @@ function get_accounts(){
 function create_account(name,perms,desc){
 	return json_request("/inventory/api/public/payments/create_account.php","name="+encode(name)+"&perms="+perms+"&desc="+encode(desc));
 }
+function account_history(id,start,end){
+	return json_request("/inventory/api/public/payments/account_history.php","id="+id+"&start="+encode(start)+"&end="+encode(end));
+}
+function get_account(id){
+	return json_request("/inventory/api/public/payments/get_account.php","id="+id);
+}
