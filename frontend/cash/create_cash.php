@@ -16,7 +16,7 @@
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
 			<div id="createCustomer">
-				<label>Name: </label><input id="name" type="text"><br>
+				<label>Name: </label><input id="nameS" type="text"><br>
 				<button id="create">Create</button>
 				<p style="color: red;" id="error"></p>
 				<p style="color: green;" id="success"></p>
@@ -28,7 +28,7 @@
 <script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
-var name = document.getElementById("name");
+var nameS = document.getElementById("nameS");
 var create = document.getElementById("create");
 var error = document.getElementById("error");
 var success = document.getElementById("success");
@@ -38,8 +38,8 @@ create.addEventListener("click",createF);
 function createF(){
 	error.innerHTML = "";
 	success.innerHTML = "";
-	if(name.value != ""){
-		var result = create_cash(name.value);
+	if(nameS.value != ""){
+		var result = create_cash(nameS.value);
 		if(!result.success){
 			error.innerHTML = "Error: "+result.reason;
 			return;
