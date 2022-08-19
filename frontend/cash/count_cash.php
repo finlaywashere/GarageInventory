@@ -20,8 +20,8 @@
 				<label>Nickels: </label><input id="nickels" type="number" min="0"><br>
 				<label>Dimes: </label><input id="dimes" type="number" min="0"><br>
 				<label>Quarters: </label><input id="quarters" type="number" min="0"><br>
-				<label>Loonies: </label><input id="toonies" type="number" min="0"><br>
-				<label>Toonies: </label><input id="loonies" type="number" min="0"><br>
+				<label>Loonies: </label><input id="loonies" type="number" min="0"><br>
+				<label>Toonies: </label><input id="toonies" type="number" min="0"><br>
 				<label>Fives: </label><input id="fives" type="number" min="0"><br>
 				<label>Tens: </label><input id="tens" type="number" min="0"><br>
 				<label>Twenties: </label><input id="twenties" type="number" min="0"><br>

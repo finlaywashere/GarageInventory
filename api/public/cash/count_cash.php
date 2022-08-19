@@ -25,7 +25,6 @@ $hundreds = req_get('hundreds');
 if($nickels < 0 || $dimes < 0 || $quarters < 0 || $loonies < 0 || $toonies < 0 || $fives < 0 || $tens < 0 || $twenties < 0 || $fifties < 0 || $hundreds < 0){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_count')));
 }
-
 $result = count_cash($id,$nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds,get_user_id(get_username()));
 if(!$result){
 	journal_log(2,"Cash ".$id." counted",11,$id,get_username(),$_SERVER['REMOTE_ADDR']);
