@@ -160,8 +160,14 @@ Payment types:
 
 function payment_create($user, $invoice, $amount, $type, $identifier, $notes=""){
 	$balance = payment_balance($invoice);
-	if($balance < $amount){
-		return 1;
+	if($type != 0){
+		if($balance < $amount){
+			return 1;
+		}
+	}else{
+		if(abs($balance - $amount) > 2){
+			return 1;
+		}
 	}
 	if($type == 4){
 		$accounts = get_accounts();

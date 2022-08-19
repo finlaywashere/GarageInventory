@@ -48,6 +48,8 @@ function custCallback(id){
 	customer.value = id;
 }
 
+var pCash = false;
+
 function showConfirm(){
 	error.innerHTML = "";
 	// Info to display to the user before confirming
@@ -57,13 +59,19 @@ function showConfirm(){
 
 	var stop = false;
 	var warn = "";
-
-	if(total != pTotal){
-		warn += "Totals do not match!<br>";
-		stop = true;
+	if(!pCash){
+		if(total != pTotal){
+			warn += "Totals do not match!<br>";
+			stop = true;
+		}
+	}else{
+		if(Math.abs(total-pTotal) > 2){
+			warn += "Totals do not match!<br>";
+			stop = true;
+		}
 	}
 
-	confirmInfo.innerHTML = "Subtotal: "+subtotal+"<br>Total: "+total+"<br>Payment Total: "+pTotal;
+	confirmInfo.innerHTML = "Subtotal: "+subtotal+"<br>Total: "+total+"<br>Payment Total: "+pTotal.toFixed(2);
 	// Show all warnings for missing data / errors / things to double check
 	if(taxexempt.checked){
 		warn += "Transaction is tax exempt!<br>";
@@ -355,12 +363,16 @@ function getPaymentTotal(){
 	return calcPaymentTotal(payments);
 }
 function calcPaymentTotal(root){
+	pCash = false;
 	var pTotal = 0;
 	for(var i = 0; i < root.childNodes.length; i++){
 		var child = root.childNodes[i];
 		if(child.nodeName == "TR"){
 			var map = {};
 			var columns = child.childNodes;
+			if(columns[1].firstChild.value == "0"){
+				pCash = true;
+			}
 			var tot = strip(columns[2].innerHTML);
 			if(tot.startsWith("$"))
 				tot = tot.substring(1);

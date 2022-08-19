@@ -73,6 +73,7 @@ for($i = 0; $i < count($entries); $i++){
 	$entries[$i]->{'notes'} = sanitize($entries[$i]->{'notes'});
 }
 $ptotal = 0;
+$pcash = false;
 for($i = 0; $i < count($payments); $i++){
 	if(!json_cont_i($payments[$i],'type') || !json_cont_i($payments[$i],'amount') || !json_cont($payments[$i],'identifier') || !json_cont($payments[$i],'notes')){
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
@@ -127,18 +128,28 @@ for($i = 0; $i < count($payments); $i++){
 		}
 	}
 	if($ptype == 0){
+		$pcash = true;
 		// Check to make sure it is a valid location
 		if(get_cash($ident) == NULL){
 			die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 		}
 		$cash = get_cash($ident)['total'];
-		if($cash-$amount < 0){
-			die(json_encode(array('success' => false, 'reason' => 'invalid_funds')));
+		if($type == 1){
+			if($cash-$amount < 0){
+				die(json_encode(array('success' => false, 'reason' => 'invalid_funds')));
+			}
 		}
 	}
 }
-if($ptotal != $total){
-	die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
+if(!$pcash){
+	if($ptotal != $total){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
+	}
+}else{
+	$diff = abs($ptotal - $total);
+	if($diff > 2){
+		die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
+	}
 }
 
 $invoice = invoice_create($subtotal,$total,$customer,$type,$notes,$entries,$orig_id,$date,$payments,get_user_id(get_username()));
