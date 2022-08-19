@@ -170,3 +170,12 @@ function account_history(id,start,end){
 function get_account(id){
 	return json_request("/inventory/api/public/payments/get_account.php","id="+id);
 }
+function create_cash(name){
+	return json_request("/inventory/api/public/cash/create_cash.php", "name="+encode(name));
+}
+function count_cash(id,nickels,dimes,quarters,loonies,toonies,fives,tens,twenties,fifties,hundreds){
+	return json_request("/inventory/api/public/cash/count_cash.php", "cash_id="+id+"&nickels="+nickels+"&dimes="+dimes+"&quarters="+quarters+"&loonies="+loonies+"&toonies="+toonies+"&fives="+fives+"&tens="+tens+"&twenties="+twenties+"&fifties="+fifties+"&hundreds="+hundreds);
+}
+function get_cash(id){
+	return json_request("/inventory/api/public/cash/get_cash.php", "cash_id="+id);
+}

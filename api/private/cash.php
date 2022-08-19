@@ -83,12 +83,17 @@ function count_cash($id, $nickels, $dimes, $quarters, $loonies, $toonies, $fives
 	if(!$conn){
 		return NULL;
 	}
+	$cash = get_cash($id);
+	$total = $nickels * 5 + $dimes * 10 + $quarters * 25 + $loonies * 100 + $toonies * 200 + $fives * 500 + $tens * 1000 + $twenties * 2000 + $fifties * 5000 + $hundreds * 10000;
+	if($cash['total'] != $total){
+		return 1;
+	}
 	$stmt = $conn->prepare("INSERT INTO cash_counts (cash_id, cash_nickels, cash_dimes, cash_quarters, cash_loonies, cash_toonies, cash_fives, cash_tens, cash_twenties, cash_fifties, cash_hundreds, cash_user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);");
 	$stmt->bind_param("iiiiiiiiiiii",$id,$nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds,$user);
 	$stmt->execute();
 	$conn->close();
-	$total = $nickels * 5 + $dimes * 10 + $quarters * 25 + $loonies * 100 + $toonies * 200 + $fives * 500 + $tens * 1000 + $twenties * 2000 + $fifties * 5000 + $hundreds * 10000;
 	set_cash($id,$total);
+	return 0;
 }
 function cash_create($name){
 	$conn = db_connect("inventory");

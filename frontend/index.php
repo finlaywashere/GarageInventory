@@ -43,6 +43,20 @@
 					</ul>
 				</div>
 				<?php
+					if(authenticate_request(100)){
+				?>
+				<div class="block">
+					<h3>Cash</h3>
+					<ul>
+						<li><h3><a href="cash/count_cash.php">Count Cash</a></h3></li>
+						<li><h3><a href="cash/create_cash.php">Create Cash Location</a></h3></li>
+						<li><h3><a href="cash/get_cash.php">Get Cash</a></h3></li>
+					</ul>
+				</div>
+				<?php
+					}
+				?>
+				<?php
 					if(authenticate_request(20)){
 				?>
 						<div class="block">

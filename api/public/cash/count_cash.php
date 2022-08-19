@@ -26,8 +26,14 @@ if($nickels < 0 || $dimes < 0 || $quarters < 0 || $loonies < 0 || $toonies < 0 |
 	die(json_encode(array('success' => false, 'reason' => 'invalid_count')));
 }
 
-count_cash($id,$nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds,get_user_id(get_username()));
-journal_log(2,"Cash ".$id." counted",11,$id,get_username(),$_SERVER['REMOTE_ADDR']);
-die(json_encode(array('success' => true)));
+$result = count_cash($id,$nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds,get_user_id(get_username()));
+if(!$result){
+	journal_log(2,"Cash ".$id." counted",11,$id,get_username(),$_SERVER['REMOTE_ADDR']);
+	die(json_encode(array('success' => true)));
+}else if($result == 1){
+	die(json_encode(array('success' => false, 'reason' => 'different_totals')));
+}else{
+	die(json_encode(array('success' => false, 'reason' => 'unknown')));
+}
 
 ?>
