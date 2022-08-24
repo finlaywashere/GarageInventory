@@ -38,7 +38,7 @@ if($result){
 if(!adjust_cash($cid, $amt * -1)){
 	die(json_encode(array('success' => false, 'reason' => 'cash_error')));
 }
-
+journal_log(2,"Cash ".$cid." paid to account ".$aid,11,$cid,get_username(),$_SERVER['REMOTE_ADDR']);
 die(json_encode(array('success' => true)));
 
 ?>
