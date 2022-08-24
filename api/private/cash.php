@@ -78,13 +78,17 @@ function set_cash($id, $total){
 	$stmt->execute();
 	$conn->close();
 }
+
+function cash_total($nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds){
+	return $nickels * 5 + $dimes * 10 + $quarters * 25 + $loonies * 100 + $toonies * 200 + $fives * 500 + $tens * 1000 + $twenties * 2000 + $fifties * 5000 + $hundreds * 10000;
+}
 function count_cash($id, $nickels, $dimes, $quarters, $loonies, $toonies, $fives, $tens, $twenties, $fifties, $hundreds, $user){
 	$conn = db_connect("inventory");
 	if(!$conn){
 		return NULL;
 	}
 	$cash = get_cash($id);
-	$total = $nickels * 5 + $dimes * 10 + $quarters * 25 + $loonies * 100 + $toonies * 200 + $fives * 500 + $tens * 1000 + $twenties * 2000 + $fifties * 5000 + $hundreds * 10000;
+	$total = cash_total($nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds);
 	if($cash['total'] != $total){
 		return 1;
 	}

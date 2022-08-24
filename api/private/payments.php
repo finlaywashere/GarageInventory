@@ -135,11 +135,15 @@ function get_account_balance($id){
 	$result = $stmt->get_result();
 
 	while($row = $result->fetch_assoc()){
-		$inv = get_invoice($row['invoice_id']);
-		if($inv['type'] == 1)
-			$bal += $row['payment_amount'];
-		else if($inv['type'] == 2)
-			$bal -= $row['payment_amount'];
+		if($row['invoice_id'] != 0){
+			$inv = get_invoice($row['invoice_id']);
+			if($inv['type'] == 1)
+				$bal += $row['payment_amount'];
+			else if($inv['type'] == 2)
+				$bal -= $row['payment_amount'];
+		}else{
+			$bal += $row['payment_amount']; // Payments from cash
+		}
 	}
 	$conn->close();
 	return $bal;
@@ -159,16 +163,6 @@ Payment types:
 */
 
 function payment_create($user, $invoice, $amount, $type, $identifier, $notes=""){
-	$balance = payment_balance($invoice);
-	if($type != 0){
-		if($balance < $amount){
-			return 1;
-		}
-	}else{
-		if(abs($balance - $amount) > 2){
-			return 1;
-		}
-	}
 	if($type == 4){
 		$accounts = get_accounts();
 		if(!isset($accounts[$identifier])){

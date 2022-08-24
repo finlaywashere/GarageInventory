@@ -15,7 +15,7 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<div id="createCustomer">
+			<div id="count">
 				<label>ID: </label><input id="id" type="number" min="1"><br>
 				<label>Nickels: </label><input id="nickels" type="number" min="0"><br>
 				<label>Dimes: </label><input id="dimes" type="number" min="0"><br>
@@ -65,7 +65,11 @@ function countF(){
 	success.innerHTML = "";
 	var result = count_cash(id.value,nickels.value,dimes.value,quarters.value,loonies.value,toonies.value,fives.value,tens.value,twenties.value,fifties.value,hundreds.value);
 	if(!result.success){
-		error.innerHTML = "Error: "+result.reason;
+		if(result.reason == "different_totals"){
+			error.innerHTML = "Error: Current cash total is $"+(result['cash_total']/100).toFixed(2)+" while count total is $"+(result['count_total']/100).toFixed(2)+"!";
+		}else{
+			error.innerHTML = "Error: "+result.reason;
+		}
 	}else{
 		success.innerHTML = "Successfully counted cash!";
 	}

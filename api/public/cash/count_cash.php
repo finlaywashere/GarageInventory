@@ -30,7 +30,9 @@ if(!$result){
 	journal_log(2,"Cash ".$id." counted",11,$id,get_username(),$_SERVER['REMOTE_ADDR']);
 	die(json_encode(array('success' => true)));
 }else if($result == 1){
-	die(json_encode(array('success' => false, 'reason' => 'different_totals')));
+	$total = cash_total($nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds);
+
+	die(json_encode(array('success' => false, 'reason' => 'different_totals', 'count_total' => $total, 'cash_total' => get_cash($id)['total'])));
 }else{
 	die(json_encode(array('success' => false, 'reason' => 'unknown')));
 }

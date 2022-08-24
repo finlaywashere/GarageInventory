@@ -179,3 +179,6 @@ function count_cash(id,nickels,dimes,quarters,loonies,toonies,fives,tens,twentie
 function get_cash(id){
 	return json_request("/inventory/api/public/cash/get_cash.php", "cash_id="+id);
 }
+function pay_account(cid, aid, amount, notes){
+	return json_request("/inventory/api/public/cash/pay_account.php", "cash_id="+cid+"&account_id="+aid+"&cash_amount="+amount+"&notes="+encode(notes));
+}

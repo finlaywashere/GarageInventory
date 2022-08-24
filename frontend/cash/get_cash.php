@@ -15,7 +15,7 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<div id="createCustomer">
+			<div id="getCash">
 				<label>ID: </label><input id="id" type="number" min="1"><br>
 				<button id="lookup">Lookup</button>
 				<p id="data"></p>

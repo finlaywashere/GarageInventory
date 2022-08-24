@@ -7,7 +7,7 @@ $auth = authenticate_request(1);
 if(!$auth){
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
-if(!req_param('cash_id')){
+if(!req_param_i('cash_id')){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_id')));
 }
 $id = req_get('cash_id');
