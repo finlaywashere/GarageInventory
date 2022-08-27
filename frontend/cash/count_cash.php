@@ -15,7 +15,7 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<div id="count">
+			<div id="countdiv">
 				<label>ID: </label><input id="id" type="number" min="1"><br>
 				<label>Nickels: </label><input id="nickels" type="number" min="0"><br>
 				<label>Dimes: </label><input id="dimes" type="number" min="0"><br>
