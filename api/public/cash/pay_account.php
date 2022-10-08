@@ -17,7 +17,7 @@ $aid = req_get('account_id');
 $amt = req_get('cash_amount');
 $notes = req_get('notes');
 
-if(strlen(trim($notes) < 4)){
+if(strlen(trim($notes)) < 4){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_notes')));
 }
 
