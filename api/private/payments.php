@@ -94,7 +94,7 @@ function account_history($id, $start, $end){
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("SELECT invoice_id,user_id,payment_amount,payment_date FROM payments WHERE payment_type=4 AND payment_identifier=? AND payment_date BETWEEN ? AND ? ORDER BY payment_date;");
+	$stmt = $conn->prepare("SELECT invoice_id,user_id,payment_amount,payment_date FROM payments WHERE payment_type=4 AND payment_identifier=? AND payment_date BETWEEN ? AND ? ORDER BY payment_date DESC;");
 	$stmt->bind_param("iss",$id,$start,$end);
 	$stmt->execute();
 

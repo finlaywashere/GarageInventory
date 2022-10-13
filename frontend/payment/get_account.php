@@ -116,16 +116,24 @@ function search(){
 		for(let i = 0; i < hist.history.length; i++){
 			var a = hist.history[i];
 			var entry = document.createElement("tr");
-			var type = a.invoice['type'];
-			createElement(invoice_type_to_string(type),entry);
-			createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+a.invoice['invoice_id']+"\">"+a.invoice['invoice_id']+"</a>",entry);
-			createElement(a['date'],entry);
-			var cid = a.invoice['customer'];
-			createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+a.invoice.customer_full['name']+"</a>",entry);
-			var mul = 1;
-			if(type == 2)
-				mul = -1;
-			createElement("$"+(a['amount']/100 * mul).toFixed(2),entry);
+			if(a.invoice != 0){
+				var type = a.invoice['type'];
+				createElement(invoice_type_to_string(type),entry);
+				createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+a.invoice['invoice_id']+"\">"+a.invoice['invoice_id']+"</a>",entry);
+				createElement(a['date'],entry);
+				var cid = a.invoice['customer'];
+				createElement("<a href=\"/inventory/frontend/customer/get_customer.php?id="+cid+"\">"+a.invoice.customer_full['name']+"</a>",entry);
+				var mul = 1;
+				if(type == 2)
+					mul = -1;
+				createElement("$"+(a['amount']/100 * mul).toFixed(2),entry);
+			}else{
+				createElement("PAYMENT", entry);
+				createElement("N/A",entry);
+				createElement(a['date'],entry);
+				createElement("N/A",entry);
+				createElement("$"+(a['amount']/100).toFixed(2),entry);
+			}
 			t_history.appendChild(entry);
 		}
 	}
