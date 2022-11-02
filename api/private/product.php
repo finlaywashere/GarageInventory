@@ -33,7 +33,7 @@ function get_product($product_id){
 		return 0;
 	}
 	$row = $result->fetch_assoc();
-	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id, "location" => $row['stock_location']);
+	$return = array("name" => $row['product_name'],"description" => $row['product_desc'],"count" => $row['stock_count'],"notes" => $row['stock_notes'], "code" => $row['stock_code'], "damaged" => $row['damaged_count'], "id" => $product_id, "location" => $row['stock_location'], "average_price" => get_avg_price($product_id));
 
 	$conn->close();
 	return $return;
@@ -57,6 +57,30 @@ function get_product_history($id){
 		array_push($ret,get_invoice($row['invoice_id']));
 	}
 	return $ret;
+}
+function get_avg_price($id){
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("SELECT `entry_unit_price`,`unit_count` FROM `invoice_entries` WHERE `product_id` = ?;");
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$count = mysqli_num_rows($result);
+	if(!$count){
+		return 0;
+	}
+	$total = 0;
+	while($row = $result->fetch_assoc()){
+		$price = $row['entry_unit_price']/$row['unit_count'];
+		if($price >= -0.01 && $price <= 0.01){
+			$count--;
+			continue;
+		}
+		$total += $price;
+	}
+	return $total/$count;
 }
 function is_product($id){
 	return get_product($id) > 0;

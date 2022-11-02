@@ -30,6 +30,7 @@
 					<th>Notes</th>
 					<th>Stock Code</th>
 					<th>Location</th>
+					<th>Average Price</th>
 				</tr>
 			</table><br>
 			<h2>History</h2>
@@ -110,6 +111,7 @@ function search(){
 	notes = createEditableElement(json.product['notes'],entry);
 	code = createEditableElement(product_type_to_string(json.product['code']),entry);
 	loc = createEditableElement(json.product['location'],entry);
+	createElement("$"+(json.product['average_price']/100).toFixed(2),entry);
 	table.appendChild(entry);
 	if(hist.history.length > 0){
 		for(let i = 0; i < hist.history.length; i++){
