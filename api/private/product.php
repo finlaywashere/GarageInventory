@@ -74,7 +74,7 @@ function get_avg_price($id){
 	$total = 0;
 	while($row = $result->fetch_assoc()){
 		$price = $row['entry_unit_price']/$row['unit_count'];
-		if($price >= -0.01 && $price <= 0.01){
+		if($price >= -1 && $price <= 1){
 			$count--;
 			continue;
 		}
