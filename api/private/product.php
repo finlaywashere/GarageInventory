@@ -80,6 +80,9 @@ function get_avg_price($id){
 		}
 		$total += $price;
 	}
+	if($count == 0){
+		return 0;
+	}
 	return $total/$count;
 }
 function is_product($id){
