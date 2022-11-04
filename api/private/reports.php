@@ -29,8 +29,7 @@ function product_report(int $id, $user){
 		}
 		$entries = get_invoice_entries($inv);
 		$count = 0;
-		foreach($entries as $entry){
-			$ent = get_invoice_entry($entry);
+		foreach($entries as $ent){
 			if($ent['product'] == $id){
 				$count += $ent['unit_count'] * $ent['count'];
 			}
