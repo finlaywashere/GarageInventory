@@ -36,7 +36,7 @@ function product_report(int $id, $user){
 		}
 		$body .= $count."\n";
 	}
-	return create_report($user, $title, html_encode($body), 0, 0);
+	return create_report($user, $title, $body, 0, 0);
 }
 function customer_report($user){
 	$date = date("Y-m-d");
@@ -107,6 +107,6 @@ function customer_report($user){
 		$tot = ($tot / 100);
 		$body .= $id."\t".$customer['name']."\t".$inc."\t".$out."\t".$sys."\t".$tot."\n";
 	}
-	return create_report($user, $title, html_encode($body), 0, 0);
+	return create_report($user, $title, $body, 0, 0);
 }
 ?>
