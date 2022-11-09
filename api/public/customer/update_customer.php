@@ -5,17 +5,21 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
 $auth = authenticate_request(4);
 if(!$auth){
+	http_response_code(401);
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 if(!req_param_i('customer_id')){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
 $id = req_get('customer_id');
 $name = "";
 if(req_param('name')){
 	$name = req_get('name');
-	if(!validate_name($name))
+	if(!validate_name($name)){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_name')));
+	}
 }
 $email = "";
 if(req_param('email')){
@@ -24,8 +28,10 @@ if(req_param('email')){
 $phone = "";
 if(req_param('phone')){
 	$phone = req_get('phone');
-	if(!validate_phone($phone))
+	if(!validate_phone($phone)){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_phone')));
+	}
 }
 $address = "";
 if(req_param('address'))
@@ -33,8 +39,10 @@ if(req_param('address'))
 $type = -1;
 if(req_param_i('type')){
 	$type = req_get('type');
-	if($type < 0 || $type > 2)
+	if($type < 0 || $type > 2){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
+	}
 }
 $notes = "";
 if(req_param('notes'))

@@ -5,9 +5,11 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
 $auth = authenticate_request(4);
 if(!$auth){
+	http_response_code(401);
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 if(!req_param('name') || !req_param('desc') || !req_param('notes') || !req_param_i('type') || !req_param('loc')){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_product')));
 }
 $name = req_get('name');
@@ -17,6 +19,7 @@ $type = req_get('type');
 $loc = req_get('loc');
 
 if($type < 0 || $type > 5){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_product')));
 }
 

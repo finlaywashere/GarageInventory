@@ -5,9 +5,11 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
 $auth = authenticate_request(1);
 if(!$auth){
+	http_response_code(401);
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 if(!req_param_i('search_type') || !req_param('search_param')){
+	http_response_code(400);
     die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
 $offset = 0;
@@ -24,6 +26,7 @@ $value = req_get('search_param');
 $result = journal_search($type,$value,$offset,$limit);
 
 if($result === NULL){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_type')));
 }
 die(json_encode(array('success' => true, 'journals' => $result)));

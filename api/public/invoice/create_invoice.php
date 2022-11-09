@@ -5,17 +5,21 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
 $auth = authenticate_request(2);
 if(!$auth){
+	http_response_code(401);
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 if(!req_param('data')){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
 // Its ok to directly access the request here because req_get sanitizes stuff and it could break the JSON
 $data = json_decode($_REQUEST['data']);
 if($data == NULL){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
 if(!json_cont_i($data,'subtotal') || !json_cont_i($data,'total') || !json_cont($data,'notes') || !json_cont_i($data,'customer') || !json_cont_i($data,'type') || !json_cont($data,'entries') || !json_cont($data,'orig_id') || !json_cont($data,'date') || !json_cont($data,'payments')){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 }
 $subtotal = sanitize($data->{'subtotal'});
@@ -34,20 +38,25 @@ if(!json_cont($data,'due_date')){
 }
 
 if($customer < 0 || !is_customer($customer)){
+	http_response_code(400);
     die(json_encode(array('success' => false, 'reason' => 'invalid_customer')));
 }
 if($type < 0 || $type > 2){
+	http_response_code(400);
     die(json_encode(array('success' => false, 'reason' => 'invalid_subtotal')));
 }
 if($type == 0 && !authenticate_request(100)){
+	http_response_code(401);
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 for($i = 0; $i < count($entries); $i++){
 	if(!json_cont_i($entries[$i],'product') || !json_cont($entries[$i],'orig') || !json_cont_i($entries[$i],'count') || !json_cont_i($entries[$i],'unit_count') || !json_cont_i($entries[$i],'unit_price') || !json_cont_i($entries[$i],'unit_discount') || !json_cont($entries[$i],'notes')){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	if(json_cont($entries[$i],'due')){
 		if(!json_cont_i($entries[$i],'due')){
+			http_response_code(400);
 			die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 		}
 	}else{
@@ -55,11 +64,13 @@ for($i = 0; $i < count($entries); $i++){
 	}
 	$product = json_get($entries[$i],'product');
 	if(!get_product($product)){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$orig = json_get($entries[$i],'orig');
 	$count = json_get($entries[$i],'count');
 	if($count < 0 || $count == 0){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$unit_count = json_get($entries[$i],'unit_count');
@@ -76,6 +87,7 @@ $ptotal = 0;
 $pcash = false;
 for($i = 0; $i < count($payments); $i++){
 	if(!json_cont_i($payments[$i],'type') || !json_cont_i($payments[$i],'amount') || !json_cont($payments[$i],'identifier') || !json_cont($payments[$i],'notes')){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	// Payment types:
@@ -88,10 +100,12 @@ for($i = 0; $i < count($payments); $i++){
 
 	$ptype = json_get($payments[$i],'type');
 	if($ptype < 0 || $ptype > 5){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$amount = json_get($payments[$i],'amount');
 	if($amount == 0){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 	}
 	$ident = json_get($payments[$i],'identifier');
@@ -100,16 +114,19 @@ for($i = 0; $i < count($payments); $i++){
 	if($ptype == 4){
 		$accounts = get_accounts();
 		if(!isset($accounts[$ident])){
+			http_response_code(400);
 			die(json_encode(array('success' => false, 'reason' => 'invalid_account')));
 		}
 		$acc = $accounts[$ident];
 		if(!authenticate_request($acc['perms'])){
+			http_response_code(400);
 			die(json_encode(array('success' => false, 'reason' => 'invalid_account')));
 		}
 		if($notes == ""){
 			$nospaces = preg_replace("/[^A-Za-z0-9]/","",$notes);
 			$len = strlen($nospaces);
 			if($len < 5){
+				http_response_code(400);
 				die(json_encode(array('success' => false, 'reason' => 'invalid_notes')));
 			}
 		}
@@ -119,10 +136,12 @@ for($i = 0; $i < count($payments); $i++){
 		$len = strlen($nospaces);
 		if($ptype > 3){
 			if($len < 1){
+				http_response_code(400);
 				die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 			}
 		}else{
 			if($len < 4){
+				http_response_code(400);
 				die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 			}
 		}
@@ -131,11 +150,13 @@ for($i = 0; $i < count($payments); $i++){
 		$pcash = true;
 		// Check to make sure it is a valid location
 		if(get_cash($ident) == NULL){
+			http_response_code(400);
 			die(json_encode(array('success' => false, 'reason' => 'invalid_data')));
 		}
 		$cash = get_cash($ident)['total'];
 		if($type == 1){
 			if($cash-$amount < 0){
+				http_response_code(400);
 				die(json_encode(array('success' => false, 'reason' => 'invalid_funds')));
 			}
 		}
@@ -143,11 +164,13 @@ for($i = 0; $i < count($payments); $i++){
 }
 if(!$pcash){
 	if($ptotal != $total){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
 	}
 }else{
 	$diff = abs($ptotal - $total);
 	if($diff > 2){
+		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
 	}
 }
@@ -155,6 +178,7 @@ if(!$pcash){
 $invoice = invoice_create($subtotal,$total,$customer,$type,$notes,$entries,$orig_id,$date,$payments,get_user_id(get_username()));
 
 if(!$invoice){
+	http_response_code(500);
 	die(json_encode(array('success' => false,'reason' => 'internal_error')));
 }
 

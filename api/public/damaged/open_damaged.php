@@ -8,9 +8,11 @@ require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
 $auth = authenticate_request(3);
 if(!$auth){
+	http_response_code(401);
     die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }
 if(!req_param_i('id')){
+	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_request')));
 }
 
@@ -19,6 +21,7 @@ $id = req_get('id');
 $success = damaged_status($id,1);
 
 if(!$success){
+	http_response_code(500);
 	die(json_encode(array('success' => false, 'reason' => 'internal_error')));
 }
 
