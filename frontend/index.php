@@ -1,7 +1,7 @@
 <?php
 	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
-    $result = authenticate_request(0);
+    $result = authenticate_request("inventory");
     if($result == 0){
     	force_login();
 	}
@@ -43,7 +43,7 @@
 					</ul>
 				</div>
 				<?php
-					if(authenticate_request(100)){
+					if(authenticate_request("inventory/cash")){
 				?>
 				<div class="block">
 					<h3>Cash</h3>
@@ -58,7 +58,7 @@
 					}
 				?>
 				<?php
-					if(authenticate_request(20)){
+					if(authenticate_request("inventory/admin")){
 				?>
 						<div class="block">
 							<h3>Administrative</h3>

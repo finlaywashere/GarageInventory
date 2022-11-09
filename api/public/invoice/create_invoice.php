@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
-$auth = authenticate_request(2);
+$auth = authenticate_request("inventory/invoice/create");
 if(!$auth){
 	http_response_code(401);
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
@@ -45,7 +45,7 @@ if($type < 0 || $type > 2){
 	http_response_code(400);
     die(json_encode(array('success' => false, 'reason' => 'invalid_subtotal')));
 }
-if($type == 0 && !authenticate_request(100)){
+if($type == 0 && !authenticate_request("inventory/admin")){
 	http_response_code(401);
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }

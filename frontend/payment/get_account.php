@@ -1,7 +1,7 @@
 <?php
 	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
-	$result = authenticate_request(2);
+	$result = authenticate_request("inventory/account");
 	if($result == 0){
 		force_login();
 	}

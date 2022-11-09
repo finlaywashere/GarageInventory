@@ -1,7 +1,7 @@
 <?php
 	require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
-	$result = authenticate_request(0);
+	$result = authenticate_request("inventory/invoice/create");
 	if($result == 0){
 		force_login();
 	}
@@ -24,7 +24,7 @@
 				<option value="1">Incoming</option>
 				<option value="2">Outgoing</option>
 				<?php
-					$create_sys = authenticate_request(100);
+					$create_sys = authenticate_request("inventory/admin");
 					if($create_sys){
 						echo "<option value=\"0\">System</option>";
 					}

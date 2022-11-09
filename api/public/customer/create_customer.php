@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT']."/inventory/api/private/inventory.php";
 
-$auth = authenticate_request(4);
+$auth = authenticate_request("inventory/customer/create");
 if(!$auth){
 	http_response_code(401);
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
@@ -27,7 +27,7 @@ if($email != "" && !validate_email($email)){
 	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_email')));
 }
-if($type == 0 && !authenticate_request(100)){
+if($type == 0 && !authenticate_request("inventory/admin")){
 	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'authorization')));
 }

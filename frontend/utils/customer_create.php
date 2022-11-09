@@ -9,7 +9,7 @@
 		<option value="1">Normal</option>
 		<option value="2">Business</option>
 		<?php
-			$create_sys = authenticate_request(100);
+			$create_sys = authenticate_request("inventory/admin");
 			if($create_sys){
 				echo "<option value=\"0\">System</option>";
 			}
