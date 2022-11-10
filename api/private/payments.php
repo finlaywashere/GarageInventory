@@ -8,8 +8,9 @@ function payment_balance($invoice){
 		return -1;
 	}
 	$stmt = $conn->prepare("SELECT invoice_total FROM invoices WHERE invoice_id = ?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$invoice);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
 		return -1;
@@ -17,8 +18,9 @@ function payment_balance($invoice){
 	$row = $result->fetch_assoc();
 	$total = $row['invoice_total'];
 	$stmt = $conn->prepare("SELECT payment_amount FROM payments WHERE invoice_id = ?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$invoice);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	
 	$paid = 0;
@@ -38,8 +40,9 @@ function get_payments($invoice){
 		return -1;
 	}
 	$stmt = $conn->prepare("SELECT * FROM payments WHERE invoice_id = ?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$invoice);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	
 	$ret = array();
@@ -57,7 +60,8 @@ function get_accounts(){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT * FROM accounts WHERE 1;");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	$ret = array();
@@ -74,8 +78,9 @@ function get_account($id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT * FROM accounts WHERE account_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	
@@ -95,8 +100,9 @@ function account_history($id, $start, $end){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT invoice_id,user_id,payment_amount,payment_date FROM payments WHERE payment_type=4 AND payment_identifier=? AND payment_date BETWEEN ? AND ? ORDER BY payment_date DESC;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("iss",$id,$start,$end);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	$ret = array();
@@ -113,10 +119,12 @@ function create_account($name,$perms,$desc){
 		return 0;
 	}
 	$stmt = $conn->prepare("INSERT INTO accounts (account_name,account_perms,account_desc) VALUES (?,?,?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("sis",$name,$perms,$desc);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	$row = $result->fetch_assoc();
 	$id = $row['LAST_INSERT_ID()'];
@@ -129,8 +137,9 @@ function get_account_balance($id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT payment_amount,invoice_id FROM payments WHERE payment_type=4 AND payment_identifier=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("s",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$bal = 0;
 	$result = $stmt->get_result();
 
@@ -187,8 +196,9 @@ function payment_create($user, $invoice, $amount, $type, $identifier, $notes="")
 		return 2;
 	}
 	$stmt = $conn->prepare("INSERT INTO payments (user_id,invoice_id,payment_amount,payment_type,payment_identifier,payment_notes) VALUES (?,?,?,?,?,?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("iiiiss",$user,$invoice,$amount,$type,$identifier,$notes);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$conn->close();
 	return 0;
 }

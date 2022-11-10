@@ -7,8 +7,9 @@ function get_customer($id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT * FROM `customers` WHERE `customer_id`=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
@@ -29,8 +30,9 @@ function get_customers_from_date($date){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE DATE(customer_creation) = ?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("s",$date);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
 		return array();
@@ -56,10 +58,12 @@ function create_customer($name, $email, $phone, $address, $type, $notes){
 		return 0;
 	}
 	$stmt = $conn->prepare("INSERT INTO `customers` (customer_name,customer_email,customer_phone,customer_address,customer_type,customer_notes) VALUES (?,?,?,?,?,?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ssssis",$name,$email,$phone,$address,$type,$notes);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	$row = $result->fetch_assoc();
 	$id = $row['LAST_INSERT_ID()'];
@@ -73,33 +77,39 @@ function update_customer($id, $name, $email, $phone, $address, $type, $notes){
 	}
 	if($name != ""){
 		$stmt = $conn->prepare("UPDATE `customers` SET customer_name=? WHERE customer_id=?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("si",$name,$id);
-		$stmt->execute();
+		if(!$stmt->execute()){ sql_error($conn); }
 	}
 	if($email != ""){
 		$stmt = $conn->prepare("UPDATE `customers` SET customer_email=? WHERE customer_id=?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("si",$email,$id);
-		$stmt->execute();
+		if(!$stmt->execute()){ sql_error($conn); }
 	}
 	if($phone != ""){
 		$stmt = $conn->prepare("UPDATE `customers` SET customer_phone=? WHERE customer_id=?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("si",$phone,$id);
-		$stmt->execute();
+		if(!$stmt->execute()){ sql_error($conn); }
 	}
 	if($address != ""){
 		$stmt = $conn->prepare("UPDATE `customers` SET customer_address=? WHERE customer_id=?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("si",$address,$id);
-		$stmt->execute();
+		if(!$stmt->execute()){ sql_error($conn); }
 	}
 	if($type != -1){
 		$stmt = $conn->prepare("UPDATE `customers` SET customer_type=? WHERE customer_id=?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("ii",$type,$id);
-		$stmt->execute();
+		if(!$stmt->execute()){ sql_error($conn); }
 	}
 	if($notes != ""){
 		$stmt = $conn->prepare("UPDATE `customers` SET customer_notes=? WHERE customer_id=?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("si",$notes,$id);
-		$stmt->execute();
+		if(!$stmt->execute()){ sql_error($conn); }
 	}
 	$conn->close();
 }
@@ -113,16 +123,19 @@ function customer_search($stype, $value, $offset, $limit){
 		// Search by name
 		$value = "%".$value."%";
 		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_name LIKE ? AND customer_id > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$value,$offset,$limit);
 	}else if($stype == 2){
 		// Search by phone
 		$value = "%".$value."%";
 		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_phone LIKE ? AND customer_id > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$value,$offset,$limit);
 	}else if($stype == 3){
 		// Search by email
 		$value = "%".$value."%";
 		$stmt = $conn->prepare("SELECT customer_id FROM customers WHERE customer_email LIKE ? AND customer_id > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("iii",$value,$offset,$limit);
 	}else if($stype == 4){
 		// Search by ID
@@ -132,7 +145,7 @@ function customer_search($stype, $value, $offset, $limit){
 		$conn->close();
 		return NULL;
 	}
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
 		return array();

@@ -8,8 +8,9 @@ function get_cash($id){
 		return NULL;
 	}
 	$stmt = $conn->prepare("SELECT * FROM cash WHERE cash_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
@@ -27,8 +28,9 @@ function get_cash_counts($id, $offset, $limit){
 		return NULL;
 	}
 	$stmt = $conn->prepare("SELECT * FROM cash_counts WHERE cash_id=? ORDER BY cash_timestamp DESC LIMIT ?,?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("iii",$id,$offset,$limit);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
@@ -47,7 +49,8 @@ function get_cash_locations(){
 		return NULL;
 	}
 	$stmt = $conn->prepare("SELECT cash_id FROM `cash` WHERE 1;");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
 		return array();
@@ -74,8 +77,9 @@ function set_cash($id, $total){
 		return NULL;
 	}
 	$stmt = $conn->prepare("UPDATE cash SET cash_amount=? WHERE cash_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ii",$total,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$conn->close();
 }
 
@@ -93,8 +97,9 @@ function count_cash($id, $nickels, $dimes, $quarters, $loonies, $toonies, $fives
 		return 1;
 	}
 	$stmt = $conn->prepare("INSERT INTO cash_counts (cash_id, cash_nickels, cash_dimes, cash_quarters, cash_loonies, cash_toonies, cash_fives, cash_tens, cash_twenties, cash_fifties, cash_hundreds, cash_user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("iiiiiiiiiiii",$id,$nickels,$dimes,$quarters,$loonies,$toonies,$fives,$tens,$twenties,$fifties,$hundreds,$user);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$conn->close();
 	set_cash($id,$total);
 	return 0;
@@ -105,10 +110,12 @@ function cash_create($name){
 		return 0;
 	}
 	$stmt = $conn->prepare("INSERT INTO cash (cash_name) VALUES (?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("s",$name);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	$row = $result->fetch_assoc();
 	$id = $row['LAST_INSERT_ID()'];

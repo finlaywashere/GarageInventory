@@ -19,10 +19,12 @@ function damaged_create($product,$desc,$user,$inv = null){
 		return 0;
 	}
 	$stmt = $conn->prepare("INSERT INTO damaged (product_id,damaged_desc,invoice_id,user_id) VALUES (?,?,?,?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("isii",$product,$desc,$inv,$user);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	$row = $result->fetch_assoc();
 	$id = $row['LAST_INSERT_ID()'];
@@ -37,8 +39,9 @@ function damaged_status($id, $status){
 		return 0;
 	}
 	$stmt = $conn->prepare("UPDATE damaged SET damaged_status=? WHERE damaged_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ii",$status,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$conn->close();
 	return 1;
 }
@@ -50,8 +53,9 @@ function damaged_complete($id, $status, $inv=null){
 	if(!$conn)
 		return 0;
 	$stmt = $conn->prepare("UPDATE damaged SET damaged_due=current_timestamp(),damaged_resolution=? WHERE damaged_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ii",$inv,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$conn->close();
 	
 	$damaged = damaged_get($id);
@@ -75,7 +79,8 @@ function damaged_retrieve(){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT damaged_id FROM damaged WHERE damaged_status < 5;");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 
@@ -93,8 +98,9 @@ function damaged_get($id){
         return 0;
     }
     $stmt = $conn->prepare("SELECT * FROM damaged WHERE damaged_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-    $stmt->execute();
+    if(!$stmt->execute()){ sql_error($conn); }
 
     $result = $stmt->get_result();
 

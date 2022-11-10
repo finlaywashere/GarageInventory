@@ -30,8 +30,9 @@ function journal_log($type, $text, $id, $ref, $user, $ip){
 		return 0;
 	}
 	$stmt = $conn->prepare("INSERT INTO `journal` (journal_type, journal_text, journal_id, journal_ref, journal_user, journal_ip) VALUES (?,?,?,?,?,?);");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("isiiss",$type,$text,$id,$ref,$user,$ip);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$conn->close();
 }
 function journal_get($uid){
@@ -40,8 +41,9 @@ function journal_get($uid){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT * FROM `journal` WHERE `journal_uid` = ?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$uid);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	
 	$result = $stmt->get_result();
     if(!mysqli_num_rows($result)){
@@ -62,34 +64,40 @@ function journal_search($stype, $value, $start, $count){
 	if($stype == 1){
 		// Search by invoice
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_invoice = ? AND journal_uid > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("iii",$value,$start,$count);
 	}else if($stype == 2){
 		// Search by date
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE DATE(journal_date) = ? AND journal_uid > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$value,$start,$count);
 	}else if($stype == 3){
 		// Search by contents
 		$value = "%".$value."%";
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_text LIKE ? AND journal_uid > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$value,$start,$count);
 	}else if($stype == 4){
 		// Search by journal type
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_id = ? AND journal_uid > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("iii",$value,$start,$count);
 	}else if($stype == 5){
 		// Search by user
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_user = ? AND journal_uid > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$value,$start,$count);
 	}else if($stype == 6){
 		// Search by ip
 		$value = "%".$value."%";
 		$stmt = $conn->prepare("SELECT journal_uid FROM journal WHERE journal_ip LIKE ? AND journal_uid > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$value,$start,$count);
 	}else{
 		$conn->close();
 		return NULL;
 	}
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
 		return array();
@@ -107,8 +115,9 @@ function get_journal($id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT * FROM journal WHERE journal_uid=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){

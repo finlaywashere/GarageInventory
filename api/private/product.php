@@ -25,8 +25,9 @@ function get_product($product_id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT * FROM `products` WHERE `product_id`=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$product_id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
@@ -45,8 +46,9 @@ function get_product_history($id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT `invoice_id` FROM `invoice_entries` WHERE `product_id` = ? ORDER BY invoice_id DESC LIMIT 20;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	if(!mysqli_num_rows($result)){
@@ -64,8 +66,9 @@ function get_avg_price($id){
 		return 0;
 	}
 	$stmt = $conn->prepare("SELECT `entry_unit_price`,`unit_count` FROM `invoice_entries` WHERE `product_id` = ?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	$count = mysqli_num_rows($result);
 	if(!$count){
@@ -100,11 +103,13 @@ function get_products($type, $param, $offset, $limit){
 	if($type == 1){
 		// Search by ID
 		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_id=? AND product_id > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("iii",$param,$offset,$limit);
 	}else if($type == 2){
 		// Search by name
 		$param = "%".$param."%";
 		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_name LIKE ? AND product_id > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$param,$offset,$limit);
 	}else if($type == 3){
 		// Search by location
@@ -114,12 +119,13 @@ function get_products($type, $param, $offset, $limit){
 		// Search by description
 		$param = "%".$param."%";
 		$stmt = $conn->prepare("SELECT product_id FROM products WHERE product_desc LIKE ? AND product_id > ? LIMIT ?;");
+		if(!$stmt){ sql_error($conn); }
 		$stmt->bind_param("sii",$param,$offset,$limit);
 	}else{
 		$conn->close();
 		return NULL;
 	}
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$result = $stmt->get_result();
 	
@@ -138,13 +144,15 @@ function adjust_stock($id, $adj){
 		return NULL;
 	}
 	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$curr = $stmt->get_result()->fetch_assoc()['stock_count'];
 	$new = $curr+$adj;
 	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ii",$new,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	return $new;
 }
 function modify_product($id,$name,$desc,$notes,$type,$loc){
@@ -153,8 +161,9 @@ function modify_product($id,$name,$desc,$notes,$type,$loc){
 		return 0;
 	}
 	$stmt = $conn->prepare("UPDATE products SET product_name=?,product_desc=?,stock_notes=?,stock_code=?,stock_location=? WHERE product_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("sssisi",$name,$desc,$notes,$type,$loc,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 
 	$conn->close();
 }
@@ -165,10 +174,12 @@ function create_product($name,$desc,$notes,$type,$loc){
 	}
 
 	$stmt = $conn->prepare("INSERT INTO products (product_name, product_desc, stock_notes, stock_code, stock_location) VALUES (?,?,?,?,?)");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("sssis",$name,$desc,$notes,$type,$loc);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	$stmt = $conn->prepare("SELECT LAST_INSERT_ID();");
-	$stmt->execute();
+	if(!$stmt){ sql_error($conn); }
+	if(!$stmt->execute()){ sql_error($conn); }
 	$result = $stmt->get_result();
 	$row = $result->fetch_assoc();
 	$id = $row['LAST_INSERT_ID()'];
@@ -181,8 +192,9 @@ function set_inventory($id, $value){
 		return 0;
 	}
 	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ii",$value,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	return 1;
 }
 function adjust_damaged($id,$count){
@@ -195,8 +207,9 @@ function set_damaged($id, $value){
 		return 0;
 	}
 	$stmt = $conn->prepare("UPDATE products SET damaged_count=? WHERE product_id=?;");
+	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("ii",$value,$id);
-	$stmt->execute();
+	if(!$stmt->execute()){ sql_error($conn); }
 	return 1;
 }
 ?>
