@@ -21,7 +21,7 @@
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
-			<table id="results" style="width: 80%;">
+			<table id="results" class="table" style="width: 80%;">
 				<tr id="table_header">
 					<th>Name</th>
 					<th>Type</th>

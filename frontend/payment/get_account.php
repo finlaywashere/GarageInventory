@@ -24,7 +24,7 @@
 		</div>
 		<div class="content">
 			<h2>Account Information</h2>
-			<table id="results" style="width: 80%;">
+			<table id="results" class="table" style="width: 80%;">
 				<tr id="table_header">
 					<th>Name</th>
 					<th>Description</th>
@@ -33,7 +33,7 @@
 				</tr>
 			</table><br>
 			<h2>Account History</h2>
-			<table id="table_history" style="width: 80%;">
+			<table id="table_history" class="table" style="width: 80%;">
 				<tr id="table_header">
 					<th>Type</th>
 					<th>Invoice</th>

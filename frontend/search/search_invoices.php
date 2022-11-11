@@ -28,7 +28,7 @@
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
-			<table id="results">
+			<table id="results" class="table">
 				<tr id="table_header">
 					<th>Date</th>
 					<th>Type</th>
@@ -109,8 +109,8 @@ function search(){
 		var iType = invoice.invoice['type'];
 		createElement(invoice_type_to_string(iType),entry);
 		createElement("<a href=\"/inventory/frontend/invoice/get_invoice.php?id="+invoice.invoice['invoice_id']+"\">"+invoice.invoice['invoice_id']+"</a>",entry);
-		createElement("$"+invoice.invoice['subtotal']/100,entry);
-		createElement("$"+invoice.invoice['total']/100,entry);
+		createElement("$"+(invoice.invoice['subtotal']/100).toFixed(2),entry);
+		createElement("$"+(invoice.invoice['total']/100).toFixed(2),entry);
 
 		createElement(customer.customer['name'],entry);
 		createElement(invoice.invoice['original_id'],entry);

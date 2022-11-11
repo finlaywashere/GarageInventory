@@ -21,7 +21,7 @@
 		</div>
 		<div class="content">
 			<h2>Invoice Information</h2>
-			<table id="invoice_table">
+			<table id="invoice_table" class="table">
 				<tr id="table_header">
 					<th>Date</th>
 					<th>Type</th>
@@ -35,7 +35,7 @@
 			</table>
 			<br>
 			<h2>Entries</h2>
-			<table id="results">
+			<table id="results" class="table">
 				<tr id="table_header">
 					<th>Product ID</th>
 					<th>Original ID</th>
@@ -49,7 +49,7 @@
 				</tr>
 			</table>
 			<h2>Payments</h2>
-			<table id="payments">
+			<table id="payments" class="table">
 				<tr id="table_header">
 					<th>User</th>
 					<th>Amount</th>

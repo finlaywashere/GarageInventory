@@ -29,7 +29,7 @@
 			<p style="color: red;" id="error"></p>
 		</div>
 		<div class="content">
-			<table id="results">
+			<table id="results" class="table">
 				<tr id="table_header">
 					<th>ID</th>
 					<th>Name</th>

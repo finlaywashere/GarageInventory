@@ -14,7 +14,7 @@
 	</head>
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
-		<div class="subheader" style="display: inline-block;">
+		<div class="subheader">
 			<label>Customer: </label><input id="customer" type="number" min="0">
 			<button id="cusLookup">Customer Lookup</button>
 			<button id="cusCreateB">Create Customer</button>
@@ -43,7 +43,7 @@
 			<button id="prodSearch">Product Search</button>
 			<button id="prodCreateB">Create Product</button>
 			<br>
-			<table id="entries">
+			<table id="entries" class="table">
 				<tr id="table_header">
 					<th>Line</th>
 					<th>Product ID</th>
@@ -59,7 +59,7 @@
 			<button id="addPayment">Add Payment</button>
 			<label for="taxexempt">Tax Exempt</label>
 			<input type="checkbox" id="taxexempt" value="Tax Exempt">
-			<table id="payments">
+			<table id="payments" class="table">
 				<tr id="table_header">
 					<th>Line</th>
 					<th>Type</th>
@@ -70,7 +70,7 @@
 			</table>
 			<br>
 			<h2 style="visibility: hidden;" id="eText">Exchange</h2>
-			<table id="eEntries" style="visibility: hidden;">
+			<table id="eEntries" style="visibility: hidden;" class="table>">
 				<tr id="table_header">
 					<th>Line</th>
 					<th>Product ID</th>
@@ -83,7 +83,7 @@
 				</tr>
 			</table>
 			<br>
-			<table id="ePayments" style="visibility: hidden">
+			<table id="ePayments" style="visibility: hidden" class="table">
 				<tr id="table_header">
 					<th>Line</th>
 					<th>Type</th>

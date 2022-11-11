@@ -14,11 +14,11 @@
 	</head>
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
-		<div class="subheader" style="display: inline-block;">
+		<div class="subheader">
 			<div class="content">
 				<h1>Accounts</h1>
 				<p id="error" style="color: red;"></p>
-				<table id="results">
+				<table id="results" class="table">
 					<tr id="table_header">
 						<th>ID</th>
 						<th>Name</th>
