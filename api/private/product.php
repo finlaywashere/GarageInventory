@@ -143,11 +143,17 @@ function adjust_stock($id, $adj){
 	if(!$conn){
 		return NULL;
 	}
-	$stmt = $conn->prepare("SELECT stock_count FROM products WHERE product_id=?;");
+	$stmt = $conn->prepare("SELECT stock_count, stock_code FROM products WHERE product_id=?;");
 	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("i",$id);
 	if(!$stmt->execute()){ sql_error($conn); }
-	$curr = $stmt->get_result()->fetch_assoc()['stock_count'];
+	$result = $stmt->get_result()->fetch_assoc();
+	$curr = $result['stock_count'];
+	$code = $result['stock_code'];
+	if($code == 5){
+		// This item is a pseudo item and is not tracked by inventory
+		return 0;
+	}
 	$new = $curr+$adj;
 	$stmt = $conn->prepare("UPDATE products SET stock_count=? WHERE product_id=?;");
 	if(!$stmt){ sql_error($conn); }
