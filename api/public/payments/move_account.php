@@ -26,17 +26,17 @@ if(!$srcAccount || !authenticate_request($srcAccount['perms']) || !$dstAccount |
     die(json_encode(array('success' => false, 'reason' => 'invalid_account')));
 }
 
-$result = payment_create(get_user_id(get_username()), 0, $amt, 4, $dst, "Payment from account to account. ".$notes);
+$result = payment_create(get_user_id(get_username()), 0, $amt, 4, $dst, "A".$src." -> A".$dst.": ".$notes);
 if($result){
 	http_response_code(500);
     die(json_encode(array('success' => false, 'reason' => 'dst_error', 'code' => $result)));
 }
-$result = payment_create(get_user_id(get_username()), 0, -$amt, 4, $src, "Payment from account to account. ".$notes);
+$result = payment_create(get_user_id(get_username()), 0, -$amt, 4, $src, "A".$src." -> A".$dst.": ".$notes);
 if($result){
 	http_response_code(500);
     die(json_encode(array('success' => false, 'reason' => 'src_error', 'code' => $result)));
 }
-journal_log(2,"Money moved from account ".$src." to ".$dst,10,$src,get_username(),$_SERVER['REMOTE_ADDR']);
+journal_log(2,"Money moved from account ".$src." to ".$dst.". Notes: ".$notes,10,$src,get_username(),$_SERVER['REMOTE_ADDR']);
 die(json_encode(array('success' => true)));
 
 

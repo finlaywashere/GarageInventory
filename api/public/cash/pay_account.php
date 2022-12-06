@@ -35,7 +35,7 @@ if(!$account || !authenticate_request($account['perms'])){
 	die(json_encode(array('success' => false, 'reason' => 'invalid_account')));
 }
 
-$result = payment_create(get_user_id(get_username()), 0, $amt, 4, $aid, "Payment from cash to account. ".$notes);
+$result = payment_create(get_user_id(get_username()), 0, $amt, 4, $aid, "C".$cid." -> A".$aid.": ".$notes);
 if($result){
 	http_response_code(500);
 	die(json_encode(array('success' => false, 'reason' => 'account_error', 'code' => $result)));
@@ -45,7 +45,7 @@ if(!adjust_cash($cid, $amt * -1)){
 	http_response_code(500);
 	die(json_encode(array('success' => false, 'reason' => 'cash_error')));
 }
-journal_log(2,"Cash ".$cid." paid to account ".$aid,11,$cid,get_username(),$_SERVER['REMOTE_ADDR']);
+journal_log(2,"Cash ".$cid." paid to account ".$aid.". Notes: ".$notes,11,$cid,get_username(),$_SERVER['REMOTE_ADDR']);
 die(json_encode(array('success' => true)));
 
 ?>

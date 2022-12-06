@@ -99,7 +99,7 @@ function account_history($id, $start, $end){
 	if(!$conn){
 		return 0;
 	}
-	$stmt = $conn->prepare("SELECT invoice_id,user_id,payment_amount,payment_date FROM payments WHERE payment_type=4 AND payment_identifier=? AND payment_date BETWEEN ? AND ? ORDER BY payment_date DESC;");
+	$stmt = $conn->prepare("SELECT invoice_id,user_id,payment_amount,payment_date,payment_notes FROM payments WHERE payment_type=4 AND payment_identifier=? AND payment_date BETWEEN ? AND ? ORDER BY payment_date DESC;");
 	if(!$stmt){ sql_error($conn); }
 	$stmt->bind_param("iss",$id,$start,$end);
 	if(!$stmt->execute()){ sql_error($conn); }
@@ -108,7 +108,7 @@ function account_history($id, $start, $end){
 	$ret = array();
 
 	while($row = $result->fetch_assoc()){
-		array_push($ret,array("invoice" => get_invoice($row['invoice_id']), "user" => $row['user_id'], "amount" => $row['payment_amount'], "date" => $row['payment_date']));
+		array_push($ret,array("invoice" => get_invoice($row['invoice_id']), "user" => $row['user_id'], "amount" => $row['payment_amount'], "date" => $row['payment_date'], "notes" => $row['payment_notes']));
 	}
 	return $ret;
 }

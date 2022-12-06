@@ -40,6 +40,7 @@
 					<th>Date</th>
 					<th>Customer</th>
 					<th>Total</th>
+					<th>Notes</th>
 				</tr>
 			</table>
 		</div>
@@ -134,6 +135,7 @@ function search(){
 				createElement("N/A",entry);
 				createElement("$"+(a['amount']/100).toFixed(2),entry);
 			}
+			createElement(a['notes'],entry)
 			t_history.appendChild(entry);
 		}
 	}
