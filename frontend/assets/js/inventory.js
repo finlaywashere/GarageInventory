@@ -193,3 +193,6 @@ function pay_account(cid, aid, amount, notes){
 function update_account(aid,name,desc,perms){
 	return json_request("/inventory/api/public/payments/update_account.php", "account="+aid+"&perms="+perms+"&name="+encode(name)+"&desc="+encode(desc));
 }
+function deposit_account(id, amount, notes){
+	return json_request("/inventory/api/public/payments/deposit_account.php", "account_id="+id+"&amount="+amount+"&notes="+encode(notes));
+}

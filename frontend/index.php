@@ -57,6 +57,7 @@
 						<h3>Administrative</h3>
 						<h3><a class="btn btn-secondary" href="payment/create_account.php">Create Account</a></h3>
 						<h3><a class="btn btn-secondary" href="payment/get_account.php">Get Account</a></h3>
+						<h3><a class="btn btn-secondary" href="payment/deposit_account.php">Bank Deposits</a></h3>
 					</div>
 					<?php
 						}

@@ -50,7 +50,7 @@ if(req_param('notes'))
 
 update_customer($id,$name,$email,$phone,$address,$type,$notes);
 
-journal_log(2,"Customer ".$id." updated",1,0,get_username(),$_SERVER['REMOTE_ADDR']);
+journal_log(2,"Customer ".$id." updated",2,$id,get_username(),$_SERVER['REMOTE_ADDR']);
 
 die(json_encode(array('success' => true)));
 
