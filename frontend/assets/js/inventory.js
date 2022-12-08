@@ -37,6 +37,14 @@ function journal_id_to_string(type){
 		return "SECURITY";
 	}else if(type === 7){
 		return "OVERRIDE";
+	}else if(type === 8){
+		return "DAMAGED";
+	}else if(type === 9){
+		return "PROJECT";
+	}else if(type === 10){
+		return "ACCOUNT";
+	}else if(type === 11){
+		return "CASH";
 	}else{
 		return "UNK";
 	}
