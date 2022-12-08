@@ -94,6 +94,26 @@ function get_account($id){
 	$conn->close();
 	return $ret;
 }
+function update_account($id, $name, $desc, $perms){
+	$acc = get_account($id);
+	if($name == NULL)
+		$name = $acc['name'];
+	if($desc == NULL)
+		$desc = $acc['desc'];
+	if($perms == NULL)
+		$perms = $acc['perms'];
+	
+	$conn = db_connect("inventory");
+	if(!$conn){
+		return 0;
+	}
+	$stmt = $conn->prepare("UPDATE accounts SET account_name=?, account_perms=?, account_desc=? WHERE account_id = ?;");
+	if(!$stmt){ sql_error($conn); }
+	$stmt->bind_param("sisi", $name, $perms, $desc, $id);
+	if(!$stmt->execute()){ sql_error($conn); }
+	$conn->close();
+	return 1;
+}
 function account_history($id, $start, $end){
 	$conn = db_connect("inventory");
 	if(!$conn){

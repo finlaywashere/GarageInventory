@@ -190,3 +190,6 @@ function get_cash(id){
 function pay_account(cid, aid, amount, notes){
 	return json_request("/inventory/api/public/cash/pay_account.php", "cash_id="+cid+"&account_id="+aid+"&cash_amount="+amount+"&notes="+encode(notes));
 }
+function update_account(aid,name,desc,perms){
+	return json_request("/inventory/api/public/payments/update_account.php", "account="+aid+"&perms="+perms+"&name="+encode(name)+"&desc="+encode(desc));
+}

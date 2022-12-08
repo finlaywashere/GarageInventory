@@ -29,6 +29,9 @@ if(!$cash){
 	http_response_code(400);
 	die(json_encode(array('success' => false, 'reason' => 'invalid_cash')));
 }
+if($cash['total'] < $amt){
+	die(json_encode(array('success' => false, 'reason' => 'invalid_amount')));
+}
 $account = get_account($aid);
 if(!$account || !authenticate_request($account['perms'])){
 	http_response_code(400);
