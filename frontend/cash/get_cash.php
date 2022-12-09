@@ -35,6 +35,12 @@ var error = document.getElementById("error");
 
 lookup.addEventListener("click",lookupF);
 
+var params = getSearchParameters();
+if(params.id != undefined){
+    id.value = params.id;
+    lookupF();
+}
+
 function lookupF(){
 	error.innerHTML = "";
 	data.innerHTML = "";

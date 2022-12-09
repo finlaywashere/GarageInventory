@@ -118,6 +118,11 @@ function search(){
 		}else if(id === 3){
 			// Product
 			createElement("<a href=\"/inventory/frontend/product/get_product.php?id="+ref+"\">Product "+ref+"</a>",entry);
+		}else if(id === 10){
+			createElement("<a href=\"/inventory/frontend/payment/get_account.php?id="+ref+"\">Account "+ref+"</a>",entry);
+		}else if(id === 11){
+			// Cash
+			createElement("<a href=\"/inventory/frontend/cash/get_cash.php?id="+ref+"\">Cash "+ref+"</a>",entry);
 		}else{
 			createElement(ref,entry);
 		}
