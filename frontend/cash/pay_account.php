@@ -16,8 +16,10 @@
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
 			<div id="payAccount">
-				<label>Cash ID: </label><input id="cid" type="number" min="1"><br>
-				<label>Account ID: </label><input id="aid" type="number" min="1"><br>
+				<label>Cash ID: </label><input id="cid" type="number" min="1">
+				<button id="pCLookup">Lookup Cash</button><br>
+				<label>Account ID: </label><input id="aid" type="number" min="1">
+				<button id="pALookup">Lookup Account</button><br>
 				<label>Amount: </label><input id="amount" type="number" step="0.05"><br>
 				<label>Notes: </label><input id="notes" type="text"><br>
 				<button id="pay">Pay Account</button>
@@ -26,6 +28,10 @@
 				<p style="color: green;" id="success"></p>
 			</div>
 		</div>
+		<?php
+			require_once "../utils/account_lookup.php";
+			require_once "../utils/cash_lookup.php";
+		?>
 	</body>
 </html>
 <script src="/assets/js/master.js"></script>
@@ -41,6 +47,19 @@ var pay = document.getElementById("pay");
 var reset = document.getElementById("reset");
 var error = document.getElementById("error");
 var success = document.getElementById("success");
+
+var cashLookup = document.getElementById("pCLookup");
+var accLookup = document.getElementById("pALookup");
+
+accLookupSetup(setAccount, accLookup);
+cashLookupSetup(setCash, cashLookup);
+
+function setAccount(acc){
+	aid.value = acc;
+}
+function setCash(cash){
+	cid.value = cash;
+}
 
 pay.addEventListener("click",payF);
 reset.addEventListener("click",resetF);

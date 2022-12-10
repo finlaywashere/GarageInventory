@@ -15,18 +15,19 @@
 	<body>
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader" style="display: inline-block;">
-			<div id="depositDiv">
-				<label>Account ID: </label><input id="id" type="number" min="1">
-				<button id="dAccLookup">Lookup Account</button><br>
+			<div id="moveDiv">
+				<label>Src ID: </label><input id="src" type="number" min="1">
+				<button id="aLookup">Lookup Account</button><br>
+				<label>Dst ID: </label><input id="dst" type="number" min="1"><br>
 				<label>Amount: </label><input id="amount" type="number"><br>
 				<label>Notes: </label><input id="notes" type="text"><br>
-				<button id="deposit">Deposit (bank to account)</button>
+				<button id="move">Move</button>
 				<p id="data"></p>
 				<p style="color: red;" id="error"></p>
 			</div>
 		</div>
 		<?php
-			require_once "../utils/account_lookup.php";
+		require_once "../utils/account_lookup.php";
 		?>
 	</body>
 </html>
@@ -34,31 +35,29 @@
 <script src="/inventory/frontend/assets/js/inventory.js"></script>
 <script>
 
-var aLookup = document.getElementById("dAccLookup");
-accLookupSetup(setAccount, aLookup);
+var lookup = document.getElementById("aLookup");
 
-var id = document.getElementById("id");
+accLookupSetup(null, lookup);
+
+var src = document.getElementById("src");
+var dst = document.getElementById("dst");
 var amount = document.getElementById("amount");
 var notes = document.getElementById("notes");
-var deposit = document.getElementById("deposit");
+var move = document.getElementById("move");
 var data = document.getElementById("data");
 var error = document.getElementById("error");
 
-deposit.addEventListener("click",depositF);
+move.addEventListener("click",moveF);
 
-function setAccount(acc){
-	id.value = acc;
-}
-
-function depositF(){
+function moveF(){
 	error.innerHTML = "";
 	data.innerHTML = "";
-	var result = deposit_account(id.value, amount.value*100, notes.value);
+	var result = move_account(src.value, dst.value, amount.value*100, notes.value);
 	if(!result.success){
 		error.innerHTML = "Error: "+result.reason;
 		return;
 	}
-	data.innerHTML = "Successfully made deposit";
+	data.innerHTML = "Successfully moved money between accounts!";
 }
 
 </script>

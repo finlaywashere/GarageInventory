@@ -196,3 +196,9 @@ function update_account(aid,name,desc,perms){
 function deposit_account(id, amount, notes){
 	return json_request("/inventory/api/public/payments/deposit_account.php", "account_id="+id+"&amount="+amount+"&notes="+encode(notes));
 }
+function move_account(src, dst, amount, notes){
+	return json_request("/inventory/api/public/payments/move_account.php", "src_id="+src+"&dst_id="+dst+"&amount="+amount+"&notes="+encode(notes));
+}
+function get_cash_locations(){
+	return json_request("/inventory/api/public/cash/get_locations.php", "");
+}

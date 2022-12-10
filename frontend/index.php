@@ -24,6 +24,7 @@
 						<h3><a class="btn btn-secondary" href="search/search_customers.php">Search Customers</a></h3>
 						<h3><a class="btn btn-secondary" href="search/search_products.php">Search Products</a></h3>
 						<h3><a class="btn btn-secondary" href="search/search_accounts.php">Search Accounts</a></h3>
+						<h3><a class="btn btn-secondary" href="search/search_cash.php">Search Cash Locations</a></h3>
 					</div>
 					<div class="col">
 						<h3>Create</h3>
@@ -58,6 +59,7 @@
 						<h3><a class="btn btn-secondary" href="payment/create_account.php">Create Account</a></h3>
 						<h3><a class="btn btn-secondary" href="payment/get_account.php">Get Account</a></h3>
 						<h3><a class="btn btn-secondary" href="payment/deposit_account.php">Bank Deposits</a></h3>
+						<h3><a class="btn btn-secondary" href="payment/move_account.php">Account Transfer</a></h3>
 					</div>
 					<?php
 						}

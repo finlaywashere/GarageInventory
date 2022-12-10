@@ -17,8 +17,13 @@ function get_cash($id){
 		return NULL;
 	}
 	$row = $result->fetch_assoc();
+	
+	$counts = get_cash_counts($id,0,1);
+	$last_count = NULL;
+	if($counts != NULL && count($counts) > 0)
+		$last_count = $counts[0];
 
-	$return = array("name" => $row['cash_name'], "total" => $row['cash_amount'], "last_count" => get_cash_counts($id,0,1)[0]);
+	$return = array("name" => $row['cash_name'], "total" => $row['cash_amount'], "last_count" => $last_count);
 	$conn->close();
 	return $return;
 }

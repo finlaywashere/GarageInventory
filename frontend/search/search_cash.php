@@ -16,15 +16,14 @@
 		<?php require($_SERVER['DOCUMENT_ROOT']."/frontend/header.php");?>
 		<div class="subheader">
 			<div class="content">
-				<h1>Accounts</h1>
+				<h1>Cash Locations</h1>
 				<p id="error" style="color: red;"></p>
 				<table id="results" class="table">
 					<tr id="table_header">
 						<th>ID</th>
 						<th>Name</th>
-						<th>Desc</th>
-						<th>Balance</th>
-						<th>Perms</th>
+						<th>Total</th>
+						<th>Last Count</th>
 					</tr>
 				</table>
 			</div>
@@ -37,20 +36,24 @@
 
 var err = document.getElementById("error");
 
-var acc = document.getElementById("results");
-var accounts = get_accounts();
-if(!accounts.success){
-	console.log("Error fetching accounts!");
-	err.innerHTML = "Failed to fetch accounts!";
+var cash = document.getElementById("results");
+var locs = get_cash_locations();
+if(!locs.success){
+	console.log("Error fetching cash locations!");
+	err.innerHTML = "Failed to fetch cash locations!";
 }else{
-	for(let key in accounts.accounts){
-		var a = accounts.accounts[key];
+	for(let key in locs.locations){
+		var a = locs.locations[key];
 		var entry = document.createElement("tr");
-		createElement("<a href=\"/inventory/frontend/payment/get_account.php?id="+key+"\">"+key+"</a>",entry);
+		createElement("<a href=\"/inventory/frontend/cash/get_cash.php?id="+key+"\">"+key+"</a>",entry);
 		createElement(a.name,entry);
-		createElement(a.desc,entry);
-		createElement("$"+(a.balance/100).toFixed(2),entry);
-		createElement(a.perms,entry);
+		createElement("$"+(a.total/100).toFixed(2),entry);
+		var last_count = a.last_count;
+		if(last_count == null){
+			createElement("Never counted!", entry);
+		}else{
+			createElement(last_count.timestamp,entry);
+		}
 		results.appendChild(entry);
 	}
 }

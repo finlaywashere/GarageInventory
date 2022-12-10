@@ -68,6 +68,14 @@ var aid;
 searchButton.addEventListener("click",search);
 saveButton.addEventListener("click",save);
 
+var curr = new Date();
+var prev = new Date(new Date().setFullYear(curr.getFullYear()-1));
+sStart = prev.getFullYear() + "-" + new String(prev.getMonth()+1).padStart(2,'0') + "-" + new String(prev.getDate()).padStart(2,'0');
+sEnd = curr.getFullYear() + "-" + new String(curr.getMonth()+1).padStart(2,'0') + "-" + new String(curr.getDate()).padStart(2, '0');
+start.value = sStart;
+end.value = sEnd;
+
+
 var params = getSearchParameters();
 if(params.id != undefined){
 	param.value = params.id;
