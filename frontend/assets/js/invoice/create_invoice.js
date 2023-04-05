@@ -60,7 +60,8 @@ function showConfirm(){
 	var stop = false;
 	var warn = "";
 	if(!pCash){
-		if(total != pTotal){
+        var precision = 0.001;
+		if(Math.abs(total-pTotal) > precision){
 			warn += "Totals do not match!<br>";
 			stop = true;
 		}

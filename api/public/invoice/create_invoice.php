@@ -163,7 +163,7 @@ for($i = 0; $i < count($payments); $i++){
 	}
 }
 if(!$pcash){
-	if($ptotal != $total){
+	if(abs($ptotal - $total) > 0.001){
 		http_response_code(400);
 		die(json_encode(array('success' => false, 'reason' => 'invalid_totals')));
 	}
